@@ -71,7 +71,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			if ( $enable_moderation == 'false' ) {
 				$bf_hide_if_not_multiple_moderators = 'bf_hide_if_not_multiple_moderators hidden';
 			}
-			
+
 			$cpublishing_moderators = 'false';
 			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators'] ) ) {
 				$cpublishing_moderators = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators'];
@@ -92,6 +92,46 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				'value' => $cpublishing_moderators_label,
 				'class' => $bf_hide_if_not_multiple_moderators
 			) );
+
+
+
+
+
+			$enable_teams                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] : 'false';
+			$form_fields['general']['enable_teams'] = new Element_Checkbox( '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_teams]", array( 'enable_teams' => '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>' ),
+				array(
+					'value'              => $enable_teams,
+					'data'               => $field_id,
+					'class'              => 'bf_enable_teams_hidden_checkbox',
+					'bf_hidden_checkbox' => 'bf_hide_if_not_enable_teams '
+				) );
+
+			$bf_hide_if_not_enable_teams = 'bf_hide_if_not_enable_teams';
+			if ( $enable_moderation == 'false' ) {
+				$bf_hide_if_not_enable_teams = 'bf_hide_if_not_enable_teams hidden';
+			}
+
+			$cpublishing_teams = 'false';
+			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'] ) ) {
+				$cpublishing_teams = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'];
+			}
+			$form_fields['general']['cpublishing_teams']       = new Element_Select( '<b>' . __( 'Select Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_teams]", $roles_array, array(
+				'value'         => $cpublishing_teams,
+				'data-field_id' => $field_id,
+				'class'         => $bf_hide_if_not_enable_teams
+			) );
+
+			$cpublishing_team_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) : __( 'Select a Team', 'buddyforms' );
+			$form_fields['general']['cpublishing_team_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_team_label]", array(
+				'data'  => $field_id,
+				'value' => $cpublishing_team_label,
+				'class' => $bf_hide_if_not_enable_teams
+			) );
+
+
+
+
+
 
 			$form_fields['general']['slug']  = new Element_Hidden( "buddyforms_options[form_fields][" . $field_id . "][slug]", 'CPUBLISHING_field_key' );
 			$form_fields['general']['type']  = new Element_Hidden( "buddyforms_options[form_fields][" . $field_id . "][type]", $field_type );
