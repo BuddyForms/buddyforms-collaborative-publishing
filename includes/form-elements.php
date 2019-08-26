@@ -94,9 +94,6 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			) );
 
 
-
-
-
 			$enable_teams                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] : 'false';
 			$form_fields['general']['enable_teams'] = new Element_Checkbox( '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_teams]", array( 'enable_teams' => '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>' ),
 				array(
@@ -115,7 +112,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'] ) ) {
 				$cpublishing_teams = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'];
 			}
-			$form_fields['general']['cpublishing_teams']       = new Element_Select( '<b>' . __( 'Select Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_teams]", $roles_array, array(
+			$form_fields['general']['cpublishing_teams'] = new Element_Select( '<b>' . __( 'Select Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_teams]", $roles_array, array(
 				'value'         => $cpublishing_teams,
 				'data-field_id' => $field_id,
 				'class'         => $bf_hide_if_not_enable_teams
@@ -127,10 +124,6 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				'value' => $cpublishing_team_label,
 				'class' => $bf_hide_if_not_enable_teams
 			) );
-
-
-
-
 
 
 			$form_fields['general']['slug']  = new Element_Hidden( "buddyforms_options[form_fields][" . $field_id . "][slug]", 'CPUBLISHING_field_key' );
@@ -188,7 +181,9 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 			}
 
 			$element_attr['class'] = $element_attr['class'] . ' bf-select2';
-			$element               = new Element_Select( $label, $slug, $options, $element_attr );
+			$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_editors', true );
+
+			$element = new Element_Select( $label, 'buddyforms_editors', $options, $element_attr );
 
 			if ( isset( $customfield['multiple_editors'] ) && is_array( $customfield['multiple_editors'] ) ) {
 				$element->setAttribute( 'multiple', 'multiple' );
@@ -199,38 +194,26 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 			$form->addElement( $element );
 
 
-			if ( $customfield['cpublishing_moderators'] == 'all' ) {
-				$blogusers = get_users();
-			} else {
-				$blogusers = get_users( array(
-					'role' => $customfield['cpublishing_moderators']
-				) );
+			if ( isset( $customfield['enable_moderation'] ) ) {
+				$label = __( 'Select Moderators', 'buddyforms' );
+				if ( isset ( $customfield['cpublishing_moderators_label'] ) ) {
+					$label = $customfield['cpublishing_moderators_label'];
+				}
+
+				$element_attr['class'] = $element_attr['class'] . ' bf-select2';
+				$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_moderators', true );
+
+				$element = new Element_Select( $label, 'buddyforms_moderators', $options, $element_attr );
+
+				if ( isset( $customfield['multiple_moderators'] ) && is_array( $customfield['multiple_moderators'] ) ) {
+					$element->setAttribute( 'multiple', 'multiple' );
+				}
+
+				BuddyFormsAssets::load_select2_assets();
+
+				$form->addElement( $element );
+
 			}
-			// Array of WP_User objects.
-			foreach ( $blogusers as $user ) {
-				$options[ $user->ID ] = $user->user_nicename;
-			}
-
-			if ( ! empty( $customfield['frontend_reset'][0] ) ) {
-				$element_attr['data-reset'] = 'true';
-			}
-
-
-			$label = __( 'Select Moderators', 'buddyforms' );
-			if ( isset ( $customfield['cpublishing_moderators_label'] ) ) {
-				$label = $customfield['cpublishing_moderators_label'];
-			}
-
-			$element_attr['class'] = $element_attr['class'] . ' bf-select2';
-			$element               = new Element_Select( $label, $slug, $options, $element_attr );
-
-			if ( isset( $customfield['multiple_moderators'] ) && is_array( $customfield['multiple_moderators'] ) ) {
-				$element->setAttribute( 'multiple', 'multiple' );
-			}
-
-			BuddyFormsAssets::load_select2_assets();
-
-			$form->addElement( $element );
 
 
 			break;
@@ -241,3 +224,16 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 }
 
 
+/*
+ * Save MailPoet Fields
+ *
+ */
+add_action( 'buddyforms_update_post_meta', 'buddyforms_cpublishing_update_post_meta', 10, 2 );
+function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
+	if ( $customfield['type'] == 'collaborative-publishing' ) {
+
+
+		update_post_meta( $post_id, 'buddyforms_editors', $_POST['buddyforms_editors'] );
+		update_post_meta( $post_id, 'buddyforms_moderators', $_POST['buddyforms_moderators'] );
+	}
+}
