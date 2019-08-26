@@ -99,8 +99,6 @@ class BuddyFormsCPublishing {
 		wp_enqueue_style( 'buddyforms-cpublishing-form-builder-css', plugins_url( 'assets/admin/css/form-builder.css', __FILE__ ));
 	}
 
-
-
 }
 
 $GLOBALS['BuddyFormsCPublishing'] = new BuddyFormsCPublishing();

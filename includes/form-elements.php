@@ -94,8 +94,6 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			) );
 
 
-
-
 			$enable_teams                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] : 'false';
 			$form_fields['general']['enable_teams'] = new Element_Checkbox( '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_teams]", array( 'enable_teams' => '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>' ),
 				array(
@@ -217,6 +215,42 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 			}
 
+			if ( isset( $customfield['enable_teams'] ) ) {
+				$label = __( 'Select a Team', 'buddyforms' );
+				if ( isset ( $customfield['cpublishing_team_label'] ) ) {
+					$label = $customfield['cpublishing_team_label'];
+				}
+
+				$element_attr['class'] = $element_attr['class'] . ' bf-select2';
+				$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_teams', true );
+
+
+				$team_forms = array();
+				if( isset($customfield['cpublishing_teams']) ){
+
+
+					$args      = array(
+						'post_type'      => $buddyforms[$customfield['cpublishing_teams']][$post_type],
+						'post_status'    => 'publish',
+						'posts_per_page' => 100
+					);
+					$the_query = new WP_Query( $args );
+
+					while ( $the_query->have_posts() ) {
+						$the_query->the_post();
+						$team_forms[] = get_the_title();
+					}
+
+				}
+
+				$element = new Element_Select( $label, 'buddyforms_teams', $team_forms, $element_attr );
+
+
+				BuddyFormsAssets::load_select2_assets();
+
+				$form->addElement( $element );
+
+			}
 
 			break;
 
