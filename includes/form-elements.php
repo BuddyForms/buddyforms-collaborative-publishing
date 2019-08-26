@@ -94,6 +94,8 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			) );
 
 
+
+
 			$enable_teams                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] : 'false';
 			$form_fields['general']['enable_teams'] = new Element_Checkbox( '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_teams]", array( 'enable_teams' => '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>' ),
 				array(
@@ -104,7 +106,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				) );
 
 			$bf_hide_if_not_enable_teams = 'bf_hide_if_not_enable_teams';
-			if ( $enable_moderation == 'false' ) {
+			if ( $enable_teams == 'false' ) {
 				$bf_hide_if_not_enable_teams = 'bf_hide_if_not_enable_teams hidden';
 			}
 
@@ -112,7 +114,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'] ) ) {
 				$cpublishing_teams = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'];
 			}
-			$form_fields['general']['cpublishing_teams'] = new Element_Select( '<b>' . __( 'Select Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_teams]", $roles_array, array(
+			$form_fields['general']['cpublishing_teams'] = new Element_Select( '<b>' . __( 'Select a Team Base', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_teams]", buddyforms_cpublishing_get_team_forms(), array(
 				'value'         => $cpublishing_teams,
 				'data-field_id' => $field_id,
 				'class'         => $bf_hide_if_not_enable_teams
@@ -235,5 +237,7 @@ function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
 
 		update_post_meta( $post_id, 'buddyforms_editors', $_POST['buddyforms_editors'] );
 		update_post_meta( $post_id, 'buddyforms_moderators', $_POST['buddyforms_moderators'] );
+
+
 	}
 }

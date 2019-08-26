@@ -78,7 +78,10 @@ class BuddyFormsCPublishing {
 	 * @since 1.0
 	 */
 	public function includes() {
+
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'form-elements.php';
+		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'functions.php';
+
 	}
 
 	/**
