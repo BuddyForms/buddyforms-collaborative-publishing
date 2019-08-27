@@ -1,5 +1,5 @@
 <?php
-
+// Get all forms with collaborative publishing functionality
 function buddyforms_cpublishing_get_team_forms() {
 	global $buddyforms;
 
