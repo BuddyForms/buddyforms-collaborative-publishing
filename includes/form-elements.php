@@ -269,7 +269,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 			}
 
 			if( isset($customfield['invite_by_mail']) ){
-				$element = new Element_HTML( do_shortcode('[buddyforms_become_an_editor]') );
+				$element = new Element_HTML( do_shortcode('[buddyforms_become_an_editor post_id=' . $post_id . ']') );
 
 				$form->addElement( $element );
 
