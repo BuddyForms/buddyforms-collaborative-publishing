@@ -212,6 +212,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 
 			if ( isset( $customfield['enable_moderation'] ) ) {
+
 				$label = __( 'Select Moderators', 'buddyforms' );
 				if ( isset ( $customfield['cpublishing_moderators_label'] ) ) {
 					$label = $customfield['cpublishing_moderators_label'];
