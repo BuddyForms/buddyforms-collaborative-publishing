@@ -140,6 +140,16 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 					'shortDesc'          => 'Display an invite by email button'
 				) );
 
+// Get all allowed pages
+			$all_pages = buddyforms_get_all_pages( 'id' );
+
+			// After Submission Page
+			$invite_register_page                         = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_register_page'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_register_page'] : 'false';
+			$form_fields['general']['invite_register_page']  = new Element_Select( '<b>' . __( "Invite Register Page", 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_register_page]", $all_pages, array(
+				'value'     => $invite_register_page,
+				'shortDesc' => __( 'Select the Page from where the content gets displayed. Will redirected to the page if ajax is disabled, otherwise display the content.', 'buddyforms' ),
+				'class'     => '',
+			) );
 
 
 
@@ -270,7 +280,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 			}
 
 			if( isset($customfield['invite_by_mail']) ){
-				$element = new Element_HTML( do_shortcode('[buddyforms_become_an_editor post_id=' . $post_id . ']') );
+				$element = new Element_HTML( do_shortcode('[buddyforms_become_an_editor form_slug="' . $form_slug . '" post_id=' . $post_id . ']') );
 
 				$form->addElement( $element );
 
