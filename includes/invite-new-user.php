@@ -75,7 +75,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id ) {
         }
     </style>
     <a id="buddyforms_invite" href="#TB_inline?width=800&height=600&inlineId=buddyforms_invite_modal"
-       title="Invite to Edit" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms' ) ?></a>
+       title="" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms' ) ?></a>
 
     <div id="buddyforms_invite_modal" style="display:none;">
         <div id="buddyforms_invite_wrap">
@@ -214,7 +214,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id ) {
 							        tokenSeparators: [\',\']
 							    })
 							    jQuery(".bf-select2-user_invite_email_select").on("change", function () {
-							    alert("biutte");
+							    
 				                     
 				                });
 						    });
@@ -230,9 +230,16 @@ function buddyforms_cbublishing_invite_new_editor( $post_id ) {
 
 				$form2->addElement( new Element_HTML( $dropdown ) );
 
+			$form2->addElement( new Element_Textarea('Invite Message Text', 'user_invite_email_message' ));
 
 
-			$form2->addElement( new Element_HTML( 'da is eine form' ) );
+
+
+
+
+
+
+
 
 			$form2->render();
 
@@ -253,7 +260,6 @@ function buddyforms_cbublishing_invite_new_editor( $post_id ) {
             <!--				</tbody>-->
             <!--			</table>-->
 
-            <textarea id="bf_invite_mail_message">Hi, Your got an invite to edit this post. [edit_post_url]</textarea>
 
             <br>
             <a id="buddyforms_invite_new_user_as_editor"
@@ -358,7 +364,7 @@ function buddyforms_ajax_load_users(){
 	}
 
 	$args = array(
-		'search_columns' => array( 'user_login', 'user_email' )
+	//	'search_columns' => array( 'user_login', 'user_email' )
 	);
 
 	$form_slug = '';
