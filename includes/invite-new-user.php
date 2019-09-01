@@ -15,9 +15,6 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
                 var user_invite_email_select = jQuery('#user_invite_email_select').val();
 
-                alert(user_invite_email_select);
-
-
                 var bf_invite_mail_to = jQuery('#bf_invite_mail_to').val();
                 var bf_invite_mail_subject = jQuery('#bf_invite_mail_subject').val();
                 var bf_invite_mail_message = jQuery('#bf_invite_mail_message').val();
@@ -39,7 +36,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                 var form_slug = jQuery('#buddyforms_invite_new_user_as_editor').attr("data-form_slug");
 
                 jQuery.ajax({
-                    type: 'POST',
+                    type: 'JSON',
                     url: ajaxurl,
                     data: {
                         "action": "buddyforms_invite_new_user_as_editor",
@@ -51,10 +48,12 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                     success: function (data) {
 
                         if (data) {
-                            alert(data);
-                        } else {
-                            window.top.location.reload();
+                            jQuery('#buddyforms_panding_invites_list').html(data);
                         }
+
+                        jQuery('#buddyforms_invite_wrap').html('<p>Invite send successfully</p>');
+
+
                     },
                     error: function (request, status, error) {
                         alert(request.responseText);
@@ -74,8 +73,14 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
             height: 96% !important;
         }
     </style>
-    <a id="buddyforms_invite" href="#TB_inline?width=800&height=600&inlineId=buddyforms_invite_modal"
-       title="" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms' ) ?></a>
+<p><a id="buddyforms_invite" href="#TB_inline?width=800&height=600&inlineId=buddyforms_invite_modal"
+      title="" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms' ) ?></a></p>
+
+    <div id="buddyforms_panding_invites">
+        <p>Pending Invites</p>
+        <div id="buddyforms_panding_invites_list">
+        </div>
+    </div>
 
     <div id="buddyforms_invite_modal" style="display:none;">
         <div id="buddyforms_invite_wrap">
@@ -276,10 +281,53 @@ function buddyforms_invite_new_user_as_editor() {
 	}
 
 
+
+	foreach ( $old_user_emails as $old_user_email ) {
+
+		$permalink = get_permalink( $buddyforms[ $_POST['form_slug'] ]['attached_page'] );
+		$permalink = apply_filters( 'buddyforms_the_loop_edit_permalink', $permalink, $buddyforms[ $_POST['form_slug'] ]['attached_page'] );
+
+//		$edit_post_link = buddyforms_edit_post_link( $text = null, $before = '', $after = '', $_POST['post_id'], $echo = false );
+//		$edit_post_link  = apply_filters( 'buddyforms_loop_edit_post_link', buddyforms_edit_post_link( '<span aria-label="' . __( 'Edit', 'buddyforms' ) . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms' ), '', '', 0, false), $_POST['post_id'], $_POST['form_slug'] );
+		$edit_post_link  = apply_filters( 'buddyforms_loop_edit_post_link', '<a title="' . __( 'Edit', 'buddyforms' ) . '" id="' . $_POST['post_id'] . '" class="bf_edit_post" href="' . $permalink . 'edit/' . $_POST['form_slug'] . '/' . $_POST['post_id'] . '"><span aria-label="' . __( 'Edit', 'buddyforms' ) . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms' ) . '</a>', $_POST['post_id'] );
+		// Now let us send the mail
+		$subject = __( 'You got an invite to edit' );
+
+		$mail_to = $old_user_email;
+
+		$emailBody = $_POST['bf_invite_mail_message'];
+
+		$emailBody .= $edit_post_link;
+
+//	$post       = get_post( $post_id );
+//	$post_title = $post->post_title;
+//	$postperma  = get_permalink( $post->ID );
+
+
+		$from_email = get_option( 'admin_email' );
+
+
+		$mailheaders = "MIME-Version: 1.0\n";
+		$mailheaders .= "X-Priority: 1\n";
+		$mailheaders .= "Content-Type: text/html; charset=\"UTF-8\"\n";
+		$mailheaders .= "Content-Transfer-Encoding: 7bit\n\n";
+		$mailheaders .= "From: " . $from_email . "<" . $from_email . ">" . "\r\n";
+
+		$message = '<html><head></head><body>' . $emailBody . '</body></html>';
+
+		$result = wp_mail( $mail_to, $subject, $message, $mailheaders );
+//		}
+
+	}
+
+
 	// Register new User
+	$new_user_email_html = '';
 	foreach ( $new_user_emails as $new_user_email ) {
-		$user_pass = $pass_confirm = wp_generate_password( 12, true );
-		$user_role = 'subscriber';
+		$new_user_email_html .= '<p>' . $new_user_email . '</p>';
+
+//		$user_pass = $pass_confirm = wp_generate_password( 12, true );
+//		$user_role = 'subscriber';
 //		$new_user_id = wp_insert_user( array(
 //			'user_pass'       => $user_pass,
 //			'user_email'      => $new_user_email,
@@ -305,7 +353,7 @@ function buddyforms_invite_new_user_as_editor() {
 
 
 		// Now let us send the mail
-		$subject = __( 'You got an invite' );
+		$subject = __( 'You got an invite to register and edit' );
 
 		$mail_to = $new_user_email;
 
@@ -338,6 +386,8 @@ function buddyforms_invite_new_user_as_editor() {
 //	if ( ! $result ) {
 //		echo __( 'There has been an error sending the message!', 'buddyforms' );
 //	}
+
+    echo $new_user_email_html;
 
 	die();
 }

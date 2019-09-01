@@ -140,7 +140,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 					'shortDesc'          => 'Display an invite by email button'
 				) );
 
-// Get all allowed pages
+			// Get all allowed pages
 			$all_pages = buddyforms_get_all_pages( 'id' );
 
 			// After Submission Page
@@ -307,6 +307,23 @@ function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
 		update_post_meta( $post_id, 'buddyforms_editors', $_POST['buddyforms_editors'] );
 		update_post_meta( $post_id, 'buddyforms_moderators', $_POST['buddyforms_moderators'] );
 		update_post_meta( $post_id, 'buddyforms_teams', $_POST['buddyforms_teams'] );
+
+		$taxonomy = get_taxonomy( 'buddyforms_user_posts' );
+		$term = get_term( $post_id, 'buddyforms_user_posts' );
+		$terms = get_terms('buddyforms_user_posts');
+		$new_term = wp_insert_term(
+			$post_id, // the term
+			'buddyforms_user_posts', // the taxonomy
+			array(
+				'slug' => $post_id,
+			)
+		);
+
+		//get the actual user ids from this posts
+		//
+		//remove the post from the user taxonomy
+		//
+		//add the post to the new users taxonomy
 
 
 	}
