@@ -36,7 +36,8 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                 var form_slug = jQuery('#buddyforms_invite_new_user_as_editor').attr("data-form_slug");
 
                 jQuery.ajax({
-                    type: 'JSON',
+                    type: 'POST',
+                    dataType: "json",
                     url: ajaxurl,
                     data: {
                         "action": "buddyforms_invite_new_user_as_editor",
@@ -47,12 +48,43 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                     },
                     success: function (data) {
 
-                        if (data) {
-                            jQuery('#buddyforms_panding_invites_list').html(data);
+                        console.log(data);
+
+                        if (data['new_user_email_html']) {
+                            jQuery('#buddyforms_panding_invites_list').html(data['new_user_email_html']);
                         }
 
-                        jQuery('#buddyforms_invite_wrap').html('<p>Invite send successfully</p>');
 
+                        var selected = [];
+
+                        if (data['old_user_emails']) {
+                            jQuery.each(data['old_user_emails'], function(index, element) {
+                                console.log(index + ' - ' + element);
+
+                                var data2 = {
+                                    id: index,
+                                    text: element
+                                };
+
+                                // Set the value, creating a new option if necessary
+                                if (jQuery('#collaborativepublishing').find("option[value='" + data2.id + "']").length) {
+                                    selected.push(data2.id);
+                                } else {
+                                    // Create a DOM Option and pre-select by default
+                                    var newOption = new Option(data2.text, data2.id, true, true);
+                                    // Append it to the select
+                                    jQuery('#collaborativepublishing').append(newOption).trigger('change');
+                                }
+
+
+                            });
+
+                            jQuery('#collaborativepublishing').val(selected).trigger('change');
+
+                        }
+
+                        // jQuery('#buddyforms_invite_wrap').html('<p>Invite send successfully</p>');
+                        tb_remove();
 
                     },
                     error: function (request, status, error) {
@@ -276,7 +308,7 @@ function buddyforms_invite_new_user_as_editor() {
 			$new_user_emails[] = $new_user_email;
 		} else {
 			$user_info         = get_userdata( $user );
-			$old_user_emails[] = $user_info->user_email;
+			$old_user_emails[$user_info->ID] = $user_info->user_email;
 		}
 	}
 
@@ -387,7 +419,9 @@ function buddyforms_invite_new_user_as_editor() {
 //		echo __( 'There has been an error sending the message!', 'buddyforms' );
 //	}
 
-    echo $new_user_email_html;
+	$json['old_user_emails'] = $old_user_emails;
+	$json['new_user_email_html'] = $new_user_email_html;
+	echo json_encode( $json );
 
 	die();
 }
