@@ -36,6 +36,8 @@ function buddyforms_cpublishing_list_editor_posts( $args ) {
 //	print_r($user_posts);
 //	echo '</pre>';
 
+
+
 	$the_lp_query = new WP_Query( array( 'post__in' => $user_posts ) );
 
 	buddyforms_locate_template( 'the-loop' );

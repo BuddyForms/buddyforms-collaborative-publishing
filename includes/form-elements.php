@@ -368,7 +368,6 @@ function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
 			}
 		}
 
-
 		// Check if the team has changed and if so remove the old team members from the buddyforms_user_posts taxonomy
 		if ( $old_team != $_POST['buddyforms_teams'] ) {
 
