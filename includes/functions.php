@@ -33,9 +33,9 @@ function buddyforms_cpublishing_user_can_edit( $is_author, $form_slug, $post_id 
 
 }
 
-//
-// make sure current_user_can is set to true if collaborative post
-//
+/**
+ * make sure current_user_can is set to true if collaborative post
+ */
 add_filter( 'buddyforms_current_user_can', 'buddyforms_cpublishing_current_user_can', 10, 3 );
 function buddyforms_cpublishing_current_user_can( $current_user_can, $form_slug, $post ) {
 
@@ -47,4 +47,23 @@ function buddyforms_cpublishing_current_user_can( $current_user_can, $form_slug,
 
 	return $current_user_can;
 
+}
+
+
+
+/**
+ * @param $form_slug
+ * @param $post_id
+ *
+ * @return mixed
+ */
+add_filter( 'buddyforms_loop_form_slug', 'buddyforms_cpublishing_loop_form_slug', 10, 2 );
+function buddyforms_cpublishing_loop_form_slug( $form_slug, $post_id ) {
+	$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
+
+	if ( in_array( $post_id, $user_posts ) ) {
+		$form_slug = get_post_meta( get_the_ID(), '_bf_form_slug', true );
+	}
+
+	return $form_slug;
 }
