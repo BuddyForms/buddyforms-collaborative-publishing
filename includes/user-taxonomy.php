@@ -1,6 +1,7 @@
 <?php
 
 function buddyforms_cpublishing_register_user_posts_taxonomy() {
+	global $buddyforms;
 
 	/**
 	 * Taxonomy: User Posts.
@@ -28,6 +29,17 @@ function buddyforms_cpublishing_register_user_posts_taxonomy() {
 		"rest_controller_class" => "WP_REST_Terms_Controller",
 		"show_in_quick_edit" => false,
 	);
+
+
+	$cforms = buddyforms_cpublishing_get_team_forms();
+
+	$post_types = array();
+	foreach ( $cforms as $slug => $form_name){
+		$post_types[] = $buddyforms[$slug]['post_type'];
+	}
+
+	register_taxonomy( "buddyforms_editors", $post_types, $args );
+
 	register_taxonomy( "buddyforms_user_posts", 'user', $args );
 }
 add_action( 'init', 'buddyforms_cpublishing_register_user_posts_taxonomy' );

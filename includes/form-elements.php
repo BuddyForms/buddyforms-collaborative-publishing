@@ -48,15 +48,15 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			$form_fields['general']['cpublishing_editors']       = new Element_Select( '<b>' . __( 'Editors', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_editors]", $roles_array, array(
 				'value'         => $cpublishing_editors,
 				'data-field_id' => $field_id,
-				'shortDesc'          => 'You can enable all users or filter the select for a specific user role'
+				'shortDesc'     => 'You can enable all users or filter the select for a specific user role'
 			) );
 			$multiple_editors                                    = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_editors'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_editors'] : 'false';
 			$form_fields['general']['multiple_editors']          = new Element_Checkbox( '<b>' . __( 'Multiple Editors', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_editors]", array( 'multiple_editors' => '<b>' . __( 'Multiple Editors', 'buddyforms' ) . '</b>' ), array( 'value' => $multiple_editors ) );
 			$cpublishing_editors_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors_label'] ) : __( 'Select Editors', 'buddyforms' );
 			$form_fields['general']['cpublishing_editors_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_editors_label]", array(
-				'data'  => $field_id,
-				'value' => $cpublishing_editors_label,
-				'shortDesc'          => 'Allow one or multiple editors'
+				'data'      => $field_id,
+				'value'     => $cpublishing_editors_label,
+				'shortDesc' => 'Allow one or multiple editors'
 			) );
 
 
@@ -82,13 +82,13 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				'value'         => $cpublishing_moderators,
 				'data-field_id' => $field_id,
 				'class'         => $bf_hide_if_not_multiple_moderators,
-				'shortDesc'          => 'You can enable all users or filter the select for a specific user role'
+				'shortDesc'     => 'You can enable all users or filter the select for a specific user role'
 			) );
 			$multiple_moderators                                    = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_moderators'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_moderators'] : 'false';
 			$form_fields['general']['multiple_moderators']          = new Element_Checkbox( '<b>' . __( 'Multiple Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_moderators]", array( 'multiple_moderators' => '<b>' . __( 'Multiple moderators', 'buddyforms' ) . '</b>' ), array(
-				'value' => $multiple_moderators,
-				'class' => $bf_hide_if_not_multiple_moderators,
-				'shortDesc'          => 'Allow one or multiple moderators.'
+				'value'     => $multiple_moderators,
+				'class'     => $bf_hide_if_not_multiple_moderators,
+				'shortDesc' => 'Allow one or multiple moderators.'
 			) );
 			$cpublishing_moderators_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) : __( 'Select Moderators', 'buddyforms' );
 			$form_fields['general']['cpublishing_moderators_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_moderators_label]", array(
@@ -120,7 +120,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				'value'         => $cpublishing_teams,
 				'data-field_id' => $field_id,
 				'class'         => $bf_hide_if_not_enable_teams,
-				'shortDesc'          => 'Select a form to use the form post type'
+				'shortDesc'     => 'Select a form to use the form post type'
 			) );
 
 			$cpublishing_team_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) : __( 'Select a Team', 'buddyforms' );
@@ -131,26 +131,24 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			) );
 
 
-
-			$invite_by_mail                         = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_by_mail'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_by_mail'] : 'false';
+			$invite_by_mail                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_by_mail'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_by_mail'] : 'false';
 			$form_fields['general']['invite_by_mail'] = new Element_Checkbox( '<b>' . __( 'Invite by Mail', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_by_mail]", array( 'invite_by_mail' => '<b>' . __( 'Invite by Mail', 'buddyforms' ) . '</b>' ),
 				array(
-					'value'              => $invite_by_mail,
-					'data'               => $field_id,
-					'shortDesc'          => 'Display an invite by email button'
+					'value'     => $invite_by_mail,
+					'data'      => $field_id,
+					'shortDesc' => 'Display an invite by email button'
 				) );
 
 			// Get all allowed pages
 			$all_pages = buddyforms_get_all_pages( 'id' );
 
 			// After Submission Page
-			$invite_register_page                         = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_register_page'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_register_page'] : 'false';
-			$form_fields['general']['invite_register_page']  = new Element_Select( '<b>' . __( "Invite Register Page", 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_register_page]", $all_pages, array(
+			$invite_register_page                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_register_page'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_register_page'] : 'false';
+			$form_fields['general']['invite_register_page'] = new Element_Select( '<b>' . __( "Invite Register Page", 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_register_page]", $all_pages, array(
 				'value'     => $invite_register_page,
 				'shortDesc' => __( 'Select the Page from where the content gets displayed. Will redirected to the page if ajax is disabled, otherwise display the content.', 'buddyforms' ),
 				'class'     => '',
 			) );
-
 
 
 			$form_fields['general']['slug']  = new Element_Hidden( "buddyforms_options[form_fields][" . $field_id . "][slug]", 'CPUBLISHING_field_key' );
@@ -185,6 +183,25 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 	switch ( $customfield['type'] ) {
 		case 'collaborative-publishing':
+
+
+//			$post_editors = wp_get_object_terms( $post_id, 'buddyforms_editors' );
+//
+//			$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts' );
+//
+//
+//			ob_start();
+//			echo 'Post Editors:<pre>';
+//			print_r( $post_editors );
+//			echo '</pre>';
+//
+//			echo '<br>User Posts<pre>';
+//			print_r( $user_posts );
+//			echo '</pre>';
+//			$JHG = ob_get_clean();
+//
+//			$form->addElement( new Element_HTML( $JHG ) );
+
 
 			if ( $customfield['cpublishing_editors'] == 'all' ) {
 				$blogusers = get_users();
@@ -254,10 +271,10 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 
 				$team_forms = array();
-				if( isset($customfield['cpublishing_teams']) ){
+				if ( isset( $customfield['cpublishing_teams'] ) ) {
 
 					$args      = array(
-						'post_type'      => $buddyforms[$customfield['cpublishing_teams']][$post_type],
+						'post_type'      => $buddyforms[ $customfield['cpublishing_teams'] ][ $post_type ],
 						'post_status'    => 'publish',
 						'posts_per_page' => 100
 					);
@@ -265,7 +282,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 					while ( $the_query->have_posts() ) {
 						$the_query->the_post();
-						$team_forms[get_the_ID()] = get_the_title();
+						$team_forms[ get_the_ID() ] = get_the_title();
 					}
 
 				}
@@ -279,8 +296,8 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 			}
 
-			if( isset($customfield['invite_by_mail']) ){
-				$element = new Element_HTML( do_shortcode('[buddyforms_become_an_editor form_slug="' . $form_slug . '" post_id=' . $post_id . ']') );
+			if ( isset( $customfield['invite_by_mail'] ) ) {
+				$element = new Element_HTML( do_shortcode( '[buddyforms_become_an_editor form_slug="' . $form_slug . '" post_id=' . $post_id . ']' ) );
 
 				$form->addElement( $element );
 
@@ -301,30 +318,80 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
  */
 add_action( 'buddyforms_update_post_meta', 'buddyforms_cpublishing_update_post_meta', 10, 2 );
 function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
+
 	if ( $customfield['type'] == 'collaborative-publishing' ) {
 
+		// Create a editors array to store all editors.
+		$editors     = array();
+		$old_editors = get_post_meta( $post_id, 'buddyforms_editors', true );
+		$old_team    = get_post_meta( $post_id, 'buddyforms_teams', true );
 
-		update_post_meta( $post_id, 'buddyforms_editors', $_POST['buddyforms_editors'] );
-		update_post_meta( $post_id, 'buddyforms_moderators', $_POST['buddyforms_moderators'] );
-		update_post_meta( $post_id, 'buddyforms_teams', $_POST['buddyforms_teams'] );
+		// Update the editors post meta
+		if ( ! empty( $_POST['buddyforms_editors'] ) ) {
+			update_post_meta( $post_id, 'buddyforms_editors', $_POST['buddyforms_editors'] );
 
-		$taxonomy = get_taxonomy( 'buddyforms_user_posts' );
-		$term = get_term( $post_id, 'buddyforms_user_posts' );
-		$terms = get_terms('buddyforms_user_posts');
-		$new_term = wp_insert_term(
-			$post_id, // the term
-			'buddyforms_user_posts', // the taxonomy
-			array(
-				'slug' => $post_id,
-			)
-		);
+			// Update the editors array
+			foreach ( $_POST['buddyforms_editors'] as $key => $editor ) {
+				$editors[ $editor ] = $editor;
+			}
+		}
 
-		//get the actual user ids from this posts
+
 		//
-		//remove the post from the user taxonomy
+		// Update the teams and add all team members to the editors array
 		//
-		//add the post to the new users taxonomy
+		if ( ! empty( $_POST['buddyforms_teams'] ) ) {
 
+			// Update the moderators post meta
+			update_post_meta( $post_id, 'buddyforms_teams', $_POST['buddyforms_teams'] );
+
+
+			// Make sure the team is not the same post
+			if ( $_POST['buddyforms_teams'] != $post_id ) {
+
+				// Get all editors form the team post
+				$team_editors = get_post_meta( $_POST['buddyforms_teams'], 'buddyforms_editors', true );
+
+				//Add all team editors to the editors array
+				foreach ( $team_editors as $tkey => $teditor ) {
+					$editors[ $teditor ] = $teditor;
+				}
+			}
+		}
+
+		// Add all editors to the buddyforms_editors taxonomy
+		$term_editors = wp_set_post_terms( $post_id, $editors, 'buddyforms_editors', false );
+
+
+		// Loop thru the old editors and remove them from the buddyforms_user_posts taxonomy
+		foreach ( $old_editors as $post_editor ) {
+			if ( ! array_key_exists( $editors, $post_editor ) ) {
+				wp_remove_object_terms( $post_editor, $post_id, 'buddyforms_user_posts' );
+			}
+		}
+
+
+		// Check if the team has changed and if so remove the old team members from the buddyforms_user_posts taxonomy
+		if ( $old_team != $_POST['buddyforms_teams'] ) {
+
+			// Gert the old team members
+			$old_team_editors = get_post_meta( $_POST['buddyforms_teams'], 'buddyforms_editors', true );
+
+			// Remove the post_id from the old team members
+			foreach ( $old_team_editors as $old_post_editor ) {
+				wp_remove_object_terms( $old_post_editor, $post_id, 'buddyforms_user_posts' );
+			}
+		}
+
+		// Loop thru all editors and add the post to the buddyforms_user_posts taxonomy
+		foreach ( $editors as $editor_id ) {
+			$user_posts = wp_set_object_terms( $editor_id, $post_id, 'buddyforms_user_posts', true );
+		}
+
+		// Update the Moderators post meta
+		if ( ! empty( $_POST['buddyforms_moderators'] ) ) {
+			$moderators = update_post_meta( $post_id, 'buddyforms_moderators', $_POST['buddyforms_moderators'] );
+		}
 
 	}
 }
