@@ -184,22 +184,19 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 	switch ( $customfield['type'] ) {
 		case 'collaborative-publishing':
 
-
 //			$post_editors = wp_get_object_terms( $post_id, 'buddyforms_editors' );
-//
 //			$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts' );
-//
-//
+
 //			ob_start();
 //			echo 'Post Editors:<pre>';
 //			print_r( $post_editors );
 //			echo '</pre>';
-//
+
 //			echo '<br>User Posts<pre>';
 //			print_r( $user_posts );
 //			echo '</pre>';
 //			$JHG = ob_get_clean();
-//
+
 //			$form->addElement( new Element_HTML( $JHG ) );
 
 
@@ -226,6 +223,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 			$element_attr['class'] = $element_attr['class'] . ' bf-select2';
 			$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_editors', true );
+			$element_attr['id']    = $customfield['slug'] . '-editors';
 
 			$element = new Element_Select( $label, 'buddyforms_editors', $options, $element_attr );
 
@@ -247,6 +245,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 				$element_attr['class'] = $element_attr['class'] . ' bf-select2';
 				$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_moderators', true );
+				$element_attr['id']    = $customfield['slug'] . '-moderators';
 
 				$element = new Element_Select( $label, 'buddyforms_moderators', $options, $element_attr );
 
@@ -268,9 +267,8 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 				$element_attr['class'] = $element_attr['class'] . ' bf-select2';
 				$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_teams', true );
-
-
-				$team_forms = array();
+				$element_attr['id']    = $customfield['slug'] . '-teams';
+				$team_forms            = array();
 				if ( isset( $customfield['cpublishing_teams'] ) ) {
 
 					$args      = array(

@@ -24,21 +24,26 @@ add_shortcode( 'buddyforms_become_an_editor', 'buddyforms_become_an_editor' );
 
 
 function buddyforms_cpublishing_list_editor_posts( $args ) {
+	global $the_lp_query;
 
 	ob_start();
 
-	echo get_current_user_id();
 
-	$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts' );
+	$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array('fields' => 'slugs') );
 
-	echo '<pre>';
-	print_r($user_posts);
-	echo '</pre>';
+
+//	echo '<pre>';
+//	print_r($user_posts);
+//	echo '</pre>';
+
+	$the_lp_query = new WP_Query( array( 'post__in' => $user_posts ) );
+
+	buddyforms_locate_template( 'the-loop' );
+
+	wp_reset_postdata();
+
 
 	$tmp = ob_get_clean();
-
-
-
 
 	return $tmp;
 }
