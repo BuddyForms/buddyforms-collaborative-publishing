@@ -58,7 +58,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                         var selected = [];
 
                         if (data['old_user_emails']) {
-                            jQuery.each(data['old_user_emails'], function(index, element) {
+                            jQuery.each(data['old_user_emails'], function (index, element) {
                                 console.log(index + ' - ' + element);
 
                                 var data2 = {
@@ -105,8 +105,8 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
             height: 96% !important;
         }
     </style>
-<p><a id="buddyforms_invite" href="#TB_inline?width=800&height=600&inlineId=buddyforms_invite_modal"
-      title="" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms' ) ?></a></p>
+    <p><a id="buddyforms_invite" href="#TB_inline?width=800&height=600&inlineId=buddyforms_invite_modal"
+          title="" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms' ) ?></a></p>
 
     <div id="buddyforms_panding_invites">
         <p>Pending Invites</p>
@@ -307,11 +307,10 @@ function buddyforms_invite_new_user_as_editor() {
 			$new_user_email    = substr( $user, 4 );
 			$new_user_emails[] = $new_user_email;
 		} else {
-			$user_info         = get_userdata( $user );
-			$old_user_emails[$user_info->ID] = $user_info->user_email;
+			$user_info                         = get_userdata( $user );
+			$old_user_emails[ $user_info->ID ] = $user_info->user_email;
 		}
 	}
-
 
 
 	foreach ( $old_user_emails as $old_user_email ) {
@@ -321,7 +320,7 @@ function buddyforms_invite_new_user_as_editor() {
 
 //		$edit_post_link = buddyforms_edit_post_link( $text = null, $before = '', $after = '', $_POST['post_id'], $echo = false );
 //		$edit_post_link  = apply_filters( 'buddyforms_loop_edit_post_link', buddyforms_edit_post_link( '<span aria-label="' . __( 'Edit', 'buddyforms' ) . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms' ), '', '', 0, false), $_POST['post_id'], $_POST['form_slug'] );
-		$edit_post_link  = apply_filters( 'buddyforms_loop_edit_post_link', '<a title="' . __( 'Edit', 'buddyforms' ) . '" id="' . $_POST['post_id'] . '" class="bf_edit_post" href="' . $permalink . 'edit/' . $_POST['form_slug'] . '/' . $_POST['post_id'] . '"><span aria-label="' . __( 'Edit', 'buddyforms' ) . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms' ) . '</a>', $_POST['post_id'] );
+		$edit_post_link = apply_filters( 'buddyforms_loop_edit_post_link', '<a title="' . __( 'Edit', 'buddyforms' ) . '" id="' . $_POST['post_id'] . '" class="bf_edit_post" href="' . $permalink . 'edit/' . $_POST['form_slug'] . '/' . $_POST['post_id'] . '"><span aria-label="' . __( 'Edit', 'buddyforms' ) . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms' ) . '</a>', $_POST['post_id'] );
 		// Now let us send the mail
 		$subject = __( 'You got an invite to edit' );
 
@@ -419,7 +418,7 @@ function buddyforms_invite_new_user_as_editor() {
 //		echo __( 'There has been an error sending the message!', 'buddyforms' );
 //	}
 
-	$json['old_user_emails'] = $old_user_emails;
+	$json['old_user_emails']     = $old_user_emails;
 	$json['new_user_email_html'] = $new_user_email_html;
 	echo json_encode( $json );
 

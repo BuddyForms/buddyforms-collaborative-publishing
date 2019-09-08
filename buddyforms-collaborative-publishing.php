@@ -99,7 +99,7 @@ class BuddyFormsCPublishing {
 
 	public function admin_js_css_enqueue() {
 		wp_enqueue_script( 'buddyforms-cpublishing-form-builder-js', plugins_url( 'assets/admin/js/form-builder.js', __FILE__ ), array( 'jquery' ) );
-		wp_enqueue_style( 'buddyforms-cpublishing-form-builder-css', plugins_url( 'assets/admin/css/form-builder.css', __FILE__ ));
+		wp_enqueue_style( 'buddyforms-cpublishing-form-builder-css', plugins_url( 'assets/admin/css/form-builder.css', __FILE__ ) );
 	}
 
 }
