@@ -364,7 +364,7 @@ function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
 		// Loop thru the old editors and remove them from the buddyforms_user_posts taxonomy
 		foreach ( $old_editors as $post_editor ) {
 			if ( ! array_key_exists( $editors, $post_editor ) ) {
-				wp_remove_object_terms( $post_editor, $post_id, 'buddyforms_user_posts' );
+				wp_remove_object_terms( $post_editor, strval($post_id), 'buddyforms_user_posts', true );
 			}
 		}
 
@@ -376,13 +376,13 @@ function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
 
 			// Remove the post_id from the old team members
 			foreach ( $old_team_editors as $old_post_editor ) {
-				wp_remove_object_terms( $old_post_editor, $post_id, 'buddyforms_user_posts' );
+				wp_remove_object_terms( $old_post_editor, strval($post_id), 'buddyforms_user_posts', true );
 			}
 		}
 
 		// Loop thru all editors and add the post to the buddyforms_user_posts taxonomy
 		foreach ( $editors as $editor_id ) {
-			$user_posts = wp_set_object_terms( $editor_id, $post_id, 'buddyforms_user_posts', true );
+			$user_posts = wp_set_object_terms( $editor_id, strval($post_id), 'buddyforms_user_posts', true );
 		}
 
 		// Update the Moderators post meta
