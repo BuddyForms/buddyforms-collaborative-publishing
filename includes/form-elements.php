@@ -60,42 +60,42 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			) );
 
 
-			$enable_moderation                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_moderation'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_moderation'] : 'false';
-			$form_fields['general']['enable_moderation'] = new Element_Checkbox( '<b>' . __( 'Enable Moderation', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_moderation]", array( 'enable_moderation' => '<b>' . __( 'Enable Moderation', 'buddyforms' ) . '</b>' ),
-				array(
-					'value'              => $enable_moderation,
-					'data'               => $field_id,
-					'class'              => 'bf_enable_moderation_hidden_checkbox',
-					'bf_hidden_checkbox' => 'bf_hide_if_not_multiple_moderators '
-				) );
-
-			$bf_hide_if_not_multiple_moderators = 'bf_hide_if_not_multiple_moderators';
-			if ( $enable_moderation == 'false' ) {
-				$bf_hide_if_not_multiple_moderators = 'bf_hide_if_not_multiple_moderators hidden';
-			}
-
-			$cpublishing_moderators = 'false';
-			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators'] ) ) {
-				$cpublishing_moderators = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators'];
-			}
-			$form_fields['general']['cpublishing_moderators']       = new Element_Select( '<b>' . __( 'Select Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_moderators]", $roles_array, array(
-				'value'         => $cpublishing_moderators,
-				'data-field_id' => $field_id,
-				'class'         => $bf_hide_if_not_multiple_moderators,
-				'shortDesc'     => 'You can enable all users or filter the select for a specific user role'
-			) );
-			$multiple_moderators                                    = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_moderators'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_moderators'] : 'false';
-			$form_fields['general']['multiple_moderators']          = new Element_Checkbox( '<b>' . __( 'Multiple Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_moderators]", array( 'multiple_moderators' => '<b>' . __( 'Multiple moderators', 'buddyforms' ) . '</b>' ), array(
-				'value'     => $multiple_moderators,
-				'class'     => $bf_hide_if_not_multiple_moderators,
-				'shortDesc' => 'Allow one or multiple moderators.'
-			) );
-			$cpublishing_moderators_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) : __( 'Select Moderators', 'buddyforms' );
-			$form_fields['general']['cpublishing_moderators_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_moderators_label]", array(
-				'data'  => $field_id,
-				'value' => $cpublishing_moderators_label,
-				'class' => $bf_hide_if_not_multiple_moderators
-			) );
+//			$enable_moderation                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_moderation'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_moderation'] : 'false';
+//			$form_fields['general']['enable_moderation'] = new Element_Checkbox( '<b>' . __( 'Enable Moderation', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_moderation]", array( 'enable_moderation' => '<b>' . __( 'Enable Moderation', 'buddyforms' ) . '</b>' ),
+//				array(
+//					'value'              => $enable_moderation,
+//					'data'               => $field_id,
+//					'class'              => 'bf_enable_moderation_hidden_checkbox',
+//					'bf_hidden_checkbox' => 'bf_hide_if_not_multiple_moderators '
+//				) );
+//
+//			$bf_hide_if_not_multiple_moderators = 'bf_hide_if_not_multiple_moderators';
+//			if ( $enable_moderation == 'false' ) {
+//				$bf_hide_if_not_multiple_moderators = 'bf_hide_if_not_multiple_moderators hidden';
+//			}
+//
+//			$cpublishing_moderators = 'false';
+//			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators'] ) ) {
+//				$cpublishing_moderators = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators'];
+//			}
+//			$form_fields['general']['cpublishing_moderators']       = new Element_Select( '<b>' . __( 'Select Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_moderators]", $roles_array, array(
+//				'value'         => $cpublishing_moderators,
+//				'data-field_id' => $field_id,
+//				'class'         => $bf_hide_if_not_multiple_moderators,
+//				'shortDesc'     => 'You can enable all users or filter the select for a specific user role'
+//			) );
+//			$multiple_moderators                                    = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_moderators'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_moderators'] : 'false';
+//			$form_fields['general']['multiple_moderators']          = new Element_Checkbox( '<b>' . __( 'Multiple Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_moderators]", array( 'multiple_moderators' => '<b>' . __( 'Multiple moderators', 'buddyforms' ) . '</b>' ), array(
+//				'value'     => $multiple_moderators,
+//				'class'     => $bf_hide_if_not_multiple_moderators,
+//				'shortDesc' => 'Allow one or multiple moderators.'
+//			) );
+//			$cpublishing_moderators_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) : __( 'Select Moderators', 'buddyforms' );
+//			$form_fields['general']['cpublishing_moderators_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_moderators_label]", array(
+//				'data'  => $field_id,
+//				'value' => $cpublishing_moderators_label,
+//				'class' => $bf_hide_if_not_multiple_moderators
+//			) );
 
 
 			$enable_teams                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] : 'false';
@@ -236,28 +236,28 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 			$form->addElement( $element );
 
 
-			if ( isset( $customfield['enable_moderation'] ) ) {
-
-				$label = __( 'Select Moderators', 'buddyforms' );
-				if ( isset ( $customfield['cpublishing_moderators_label'] ) ) {
-					$label = $customfield['cpublishing_moderators_label'];
-				}
-
-				$element_attr['class'] = $element_attr['class'] . ' bf-select2';
-				$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_moderators', true );
-				$element_attr['id']    = $customfield['slug'] . '-moderators';
-
-				$element = new Element_Select( $label, 'buddyforms_moderators', $options, $element_attr );
-
-				if ( isset( $customfield['multiple_moderators'] ) && is_array( $customfield['multiple_moderators'] ) ) {
-					$element->setAttribute( 'multiple', 'multiple' );
-				}
-
-				BuddyFormsAssets::load_select2_assets();
-
-				$form->addElement( $element );
-
-			}
+//			if ( isset( $customfield['enable_moderation'] ) ) {
+//
+//				$label = __( 'Select Moderators', 'buddyforms' );
+//				if ( isset ( $customfield['cpublishing_moderators_label'] ) ) {
+//					$label = $customfield['cpublishing_moderators_label'];
+//				}
+//
+//				$element_attr['class'] = $element_attr['class'] . ' bf-select2';
+//				$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_moderators', true );
+//				$element_attr['id']    = $customfield['slug'] . '-moderators';
+//
+//				$element = new Element_Select( $label, 'buddyforms_moderators', $options, $element_attr );
+//
+//				if ( isset( $customfield['multiple_moderators'] ) && is_array( $customfield['multiple_moderators'] ) ) {
+//					$element->setAttribute( 'multiple', 'multiple' );
+//				}
+//
+//				BuddyFormsAssets::load_select2_assets();
+//
+//				$form->addElement( $element );
+//
+//			}
 
 			if ( isset( $customfield['enable_teams'] ) ) {
 				$label = __( 'Select a Team', 'buddyforms' );
@@ -340,7 +340,7 @@ function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
 		//
 		if ( ! empty( $_POST['buddyforms_teams'] ) ) {
 
-			// Update the moderators post meta
+			// Update the team post meta
 			update_post_meta( $post_id, 'buddyforms_teams', $_POST['buddyforms_teams'] );
 
 
@@ -386,9 +386,9 @@ function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
 		}
 
 		// Update the Moderators post meta
-		if ( ! empty( $_POST['buddyforms_moderators'] ) ) {
-			$moderators = update_post_meta( $post_id, 'buddyforms_moderators', $_POST['buddyforms_moderators'] );
-		}
+//		if ( ! empty( $_POST['buddyforms_moderators'] ) ) {
+//			$moderators = update_post_meta( $post_id, 'buddyforms_moderators', $_POST['buddyforms_moderators'] );
+//		}
 
 	}
 }
