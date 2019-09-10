@@ -47,6 +47,8 @@ class BuddyFormsCPublishing {
 		add_action( 'init', array( $this, 'includes' ), 4, 1 );
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'buddyforms_admin_js_css_enqueue', array( $this, 'admin_js_css_enqueue' ) );
+		add_action( 'buddyforms_front_js_css_after_enqueue', array( $this, 'buddyforms_front_js_css_enqueue' ) );
+
 		$this->load_constants();
 	}
 
@@ -100,6 +102,10 @@ class BuddyFormsCPublishing {
 	public function admin_js_css_enqueue() {
 		wp_enqueue_script( 'buddyforms-cpublishing-form-builder-js', plugins_url( 'assets/admin/js/form-builder.js', __FILE__ ), array( 'jquery' ) );
 		wp_enqueue_style( 'buddyforms-cpublishing-form-builder-css', plugins_url( 'assets/admin/css/form-builder.css', __FILE__ ) );
+	}
+
+	function buddyforms_front_js_css_enqueue() {
+		wp_enqueue_script( 'buddyforms-collaborative-js', plugins_url( 'assets/js/collaborative.js', __FILE__ ), array( 'jquery' ) );
 	}
 
 }

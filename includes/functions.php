@@ -143,3 +143,23 @@ function buddyforms_cpublishing_delete_post( $post_id ) {
 }
 
 add_action( 'buddyforms_delete_post', 'buddyforms_cpublishing_delete_post', 10, 1 );
+
+
+add_action('buddyforms_the_loop_actions', 'buddyforms_cpublishing_the_loop_actions' );
+function buddyforms_cpublishing_the_loop_actions( $post_id ){
+
+	$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
+
+	if ( in_array( $post_id, $user_posts ) ) {
+		echo '<li>';
+		echo '<a title="' . __( 'Remove as Editor', 'buddyforms' ) . '"  id="' . $post_id . '" class="bf_remove_as_editor" href="#"><span aria-label="' . __( 'Remove as Editor', 'buddyforms' ) . '" title="' . __( 'Remove as Editor', 'buddyforms' ) . '" class="dashicons dashicons-trash"> </span> ' . __( 'Remove as Editor', 'buddyforms' ) . '</a></li>';
+		echo '</li>';
+	} else {
+		echo '<li>';
+		echo '<a title="' . __( 'Become an Editor', 'buddyforms' ) . '"  id="' . $post_id . '" class="bf_become_an_editor" href="#"><span aria-label="' . __( 'Become an Editor', 'buddyforms' ) . '" title="' . __( 'Become an Editor', 'buddyforms' ) . '" class="dashicons dashicons-trash"> </span> ' . __( 'Become an Editor', 'buddyforms' ) . '</a></li>';
+		echo '</li>';
+    }
+
+
+
+}
