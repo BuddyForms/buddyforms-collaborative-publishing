@@ -60,4 +60,33 @@ jQuery(document).ready(function () {
         }
         return false;
     });
+
+    jQuery(document.body).on('click', '.bf_cpublishing_delete_post', function () {
+        var post_id = jQuery(this).attr('id');
+
+        if (confirm( 'Remove as Editor' )) { // todo need il18n
+            jQuery.ajax({
+                type: 'POST',
+                url: buddyformsGlobal.admin_url,
+                data: {"action": "buddyforms_ajax_delete_post", "post_id": post_id},
+                success: function (data) {
+                    if (isNaN(data)) {
+                        alert(data);
+                    } else {
+                        var id = "#bf_post_li_";
+                        var li = id + data;
+                        li = li.replace(/\s+/g, '');
+                        jQuery(li).remove();
+                    }
+                },
+                error: function (request) {
+                    alert(request.responseText);
+                }
+            });
+        } else {
+            return false;
+        }
+        return false;
+    });
+
 });

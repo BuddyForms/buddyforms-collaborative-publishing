@@ -87,6 +87,7 @@ class BuddyFormsCPublishing {
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'shortcodes.php';
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'user-taxonomy.php';
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'become-an-editor.php';
+		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'delete-post.php';
 
 	}
 

@@ -35,6 +35,7 @@ function buddyforms_cpublishing_get_team_forms() {
  * @return bool
  */
 function buddyforms_cpublishing_user_can_edit( $is_author, $form_slug, $post_id ) {
+
 	$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
 
 	if ( in_array( $post_id, $user_posts ) ) {
@@ -45,7 +46,7 @@ function buddyforms_cpublishing_user_can_edit( $is_author, $form_slug, $post_id 
 
 }
 
-add_filter( 'buddyforms_user_can_edit', 'buddyforms_cpublishing_user_can_edit', 10, 3 );
+add_filter( 'buddyforms_user_can_edit', 'buddyforms_cpublishing_user_can_edit', 10, 4 );
 
 /**
  *
@@ -57,19 +58,22 @@ add_filter( 'buddyforms_user_can_edit', 'buddyforms_cpublishing_user_can_edit', 
  *
  * @return bool
  */
-function buddyforms_cpublishing_current_user_can( $current_user_can, $form_slug, $post ) {
+function buddyforms_cpublishing_current_user_can( $current_user_can, $form_slug, $post, $type ) {
 
-	$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
+	if ( $type == 'edit' ) {
+		$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
 
-	if ( in_array( $post->ID, $user_posts ) ) {
-		$current_user_can = true;
+		if ( in_array( $post->ID, $user_posts ) ) {
+			$current_user_can = true;
+		}
 	}
+
 
 	return $current_user_can;
 
 }
 
-add_filter( 'buddyforms_current_user_can', 'buddyforms_cpublishing_current_user_can', 10, 3 );
+add_filter( 'buddyforms_current_user_can', 'buddyforms_cpublishing_current_user_can', 10, 4 );
 
 /**
  * @param $form_slug
@@ -106,7 +110,7 @@ function buddyforms_cpublishing_user_can_delete( $user_can_delete, $form_slug, $
 	return $user_can_delete;
 }
 
-add_filter( 'buddyforms_user_can_delete', 'buddyforms_cpublishing_user_can_delete', 10, 3 );
+//add_filter( 'buddyforms_user_can_delete', 'buddyforms_cpublishing_user_can_delete', 10, 3 );
 
 
 function buddyforms_cpublishing_delete_post( $post_id ) {
@@ -149,11 +153,20 @@ add_action( 'buddyforms_the_loop_actions_last', 'buddyforms_cpublishing_the_loop
 function buddyforms_cpublishing_the_loop_actions( $post_id ) {
 
 	$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
+	$form_slug  = get_post_meta( $post_id, '_bf_form_slug', true );
 
 	if ( in_array( $post_id, $user_posts ) ) {
 		echo '<li>';
 		echo '<a title="' . __( 'Remove as Editor', 'buddyforms' ) . '"  id="' . $post_id . '" class="bf_remove_as_editor" href="#"><span aria-label="' . __( 'Remove as Editor', 'buddyforms' ) . '" title="' . __( 'Remove as Editor', 'buddyforms' ) . '" class="dashicons dashicons-trash"> </span> ' . __( 'Remove as Editor', 'buddyforms' ) . '</a></li>';
 		echo '</li>';
+		echo '<li>';
+		//echo '<a title="' . __( 'Delete Post', 'buddyforms' ) . '"  id="' . $post_id . '" class="bf_cpublishing_delete_post" href="#"><span aria-label="' . __( 'Delete Post', 'buddyforms' ) . '" title="' . __( 'Delete Post', 'buddyforms' ) . '" class="dashicons dashicons-trash"> </span> ' . __( 'Delete Post', 'buddyforms' ) . '</a></li>';
+		buddyforms_cbublishing_delete_post( $post_id, $form_slug );
+		echo '</li>';
+
+
+
+
 	} else {
 		$author_id = get_post_field( 'post_author', $post_id );
 		if ( get_current_user_id() != $author_id ) {
