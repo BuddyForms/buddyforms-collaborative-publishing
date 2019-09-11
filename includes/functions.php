@@ -113,8 +113,13 @@ function buddyforms_cpublishing_user_can_delete( $user_can_delete, $form_slug, $
 //add_filter( 'buddyforms_user_can_delete', 'buddyforms_cpublishing_user_can_delete', 10, 3 );
 
 
-function buddyforms_cpublishing_delete_post( $post_id ) {
-	$user_posts = wp_get_object_terms( $current_user = get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
+function buddyforms_cpublishing_delete_post( $post_id, $current_user = '' ) {
+
+	if ( empty( $current_user ) ) {
+		$current_user = get_current_user_id();
+	}
+
+	$user_posts = wp_get_object_terms( $current_user, 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
 
 	if ( in_array( $post_id, $user_posts ) ) {
 
@@ -142,8 +147,8 @@ function buddyforms_cpublishing_delete_post( $post_id ) {
 
 	}
 
-	echo $post_id;
-	die();
+//	echo $post_id;
+//	die();
 }
 
 add_action( 'buddyforms_delete_post', 'buddyforms_cpublishing_delete_post', 10, 1 );
@@ -163,8 +168,6 @@ function buddyforms_cpublishing_the_loop_actions( $post_id ) {
 		//echo '<a title="' . __( 'Delete Post', 'buddyforms' ) . '"  id="' . $post_id . '" class="bf_cpublishing_delete_post" href="#"><span aria-label="' . __( 'Delete Post', 'buddyforms' ) . '" title="' . __( 'Delete Post', 'buddyforms' ) . '" class="dashicons dashicons-trash"> </span> ' . __( 'Delete Post', 'buddyforms' ) . '</a></li>';
 		buddyforms_cbublishing_delete_post( $post_id, $form_slug );
 		echo '</li>';
-
-
 
 
 	} else {

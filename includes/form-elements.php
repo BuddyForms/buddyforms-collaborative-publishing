@@ -361,9 +361,15 @@ function buddyforms_cpublishing_update_post_meta( $customfield, $post_id ) {
 		$term_editors = wp_set_post_terms( $post_id, $editors, 'buddyforms_editors', false );
 
 
-		// Loop thru the old editors and remove them from the buddyforms_user_posts taxonomy
+
+
+
+
+
+
+		// Loop through the old editors and remove them from the buddyforms_user_posts taxonomy
 		foreach ( $old_editors as $post_editor ) {
-			if ( ! array_key_exists( $editors, $post_editor ) ) {
+			if ( ! array_key_exists( $post_editor, $editors ) ) {
 				wp_remove_object_terms( $post_editor, strval($post_id), 'buddyforms_user_posts', true );
 			}
 		}

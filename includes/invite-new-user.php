@@ -176,7 +176,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
 
 			// Required
-			$dropdown = str_replace( 'id=', 'required id=', $dropdown );
+			//$dropdown = str_replace( 'id=', 'required id=', $dropdown );
 
 
 			$dropdown = str_replace( 'id=', 'data-form="user_invite_email_select" id=', $dropdown );
