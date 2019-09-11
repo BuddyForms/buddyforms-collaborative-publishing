@@ -227,6 +227,16 @@ function buddyforms_delete_post_request() {
 			if ( $key == $buddyform_delete_post_editor ) {
 				// Delete editor from meta and taxonomies
 				buddyforms_cpublishing_delete_post( $post_id, $user_id );
+
+
+				$post_editors = wp_get_post_terms( $post_id, 'buddyforms_editors' );
+
+				$post_count = count($post_editors);
+				if($post_count == 0){
+					do_action( 'buddyforms_delete_post', $post_id );
+					wp_delete_post( $post_id );
+                }
+
 			}
 		}
 
