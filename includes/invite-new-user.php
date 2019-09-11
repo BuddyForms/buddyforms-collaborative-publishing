@@ -67,19 +67,19 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                                 };
 
                                 // Set the value, creating a new option if necessary
-                                if (jQuery('#collaborativepublishing').find("option[value='" + data2.id + "']").length) {
+                                if (jQuery('#col-lab-editors').find("option[value='" + data2.id + "']").length) {
                                     selected.push(data2.id);
                                 } else {
                                     // Create a DOM Option and pre-select by default
                                     var newOption = new Option(data2.text, data2.id, true, true);
                                     // Append it to the select
-                                    jQuery('#collaborativepublishing').append(newOption).trigger('change');
+                                    jQuery('#col-lab-editors').append(newOption).trigger('change');
                                 }
 
 
                             });
 
-                            jQuery('#collaborativepublishing').val(selected).trigger('change');
+                            jQuery('#col-lab-editors').val(selected).trigger('change');
 
                         }
 
@@ -251,7 +251,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
 			$form2->addElement( new Element_HTML( $dropdown ) );
 
-			$form2->addElement( new Element_Textarea( 'Invite Message Text', 'user_invite_email_message' ) );
+			$form2->addElement( new Element_Textarea( 'Invite Message Text', 'user_invite_email_message', array('value' => 'Message text') ) );
 
 
 			$form2->render();

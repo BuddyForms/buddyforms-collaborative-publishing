@@ -136,8 +136,17 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				array(
 					'value'     => $invite_by_mail,
 					'data'      => $field_id,
-					'shortDesc' => 'Display an invite by email button'
+					'shortDesc' => 'Display an invite by email button',
+					'class'     => 'bf_invite_by_mail_hidden_checkbox',
+					'bf_hidden_checkbox' => 'bf_hide_if_not_invite_by_mail '
 				) );
+
+
+			$bf_hide_if_not_invite_by_mail = 'bf_hide_if_not_invite_by_mail';
+			if ( $invite_by_mail == 'false' ) {
+				$bf_hide_if_not_invite_by_mail = 'bf_hide_if_not_invite_by_mail hidden';
+			}
+
 
 			// Get all allowed pages
 			$all_pages = buddyforms_get_all_pages( 'id' );
@@ -147,9 +156,16 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			$form_fields['general']['invite_register_page'] = new Element_Select( '<b>' . __( "Invite Register Page", 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_register_page]", $all_pages, array(
 				'value'     => $invite_register_page,
 				'shortDesc' => __( 'Select the Page from where the content gets displayed. Will redirected to the page if ajax is disabled, otherwise display the content.', 'buddyforms' ),
-				'class'     => '',
+				'class'     => $bf_hide_if_not_invite_by_mail,
 			) );
 
+
+			$invite_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_message'] ) : __( 'You got an invite to edit a post', 'buddyforms' );
+			$form_fields['general']['invite_message'] = new Element_Textbox( '<b>' . __( 'Message Text', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_message]", array(
+				'data'  => $field_id,
+				'value' => $invite_message,
+				'class' => $bf_hide_if_not_invite_by_mail,
+			) );
 
 			$form_fields['general']['slug']  = new Element_Hidden( "buddyforms_options[form_fields][" . $field_id . "][slug]", 'CPUBLISHING_field_key' );
 			$form_fields['general']['type']  = new Element_Hidden( "buddyforms_options[form_fields][" . $field_id . "][type]", $field_type );
