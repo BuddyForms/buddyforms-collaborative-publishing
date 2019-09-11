@@ -208,6 +208,9 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 				) );
 			}
 			// Array of WP_User objects.
+			if ( ! (isset( $customfield['multiple_editors'] ) && is_array( $customfield['multiple_editors'] )) ) {
+				$options['none'] = __( 'Select an Editor' );
+			}
 			foreach ( $blogusers as $user ) {
 				$options[ $user->ID ] = $user->user_nicename;
 			}
@@ -268,7 +271,8 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 				$element_attr['class'] = $element_attr['class'] . ' bf-select2';
 				$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_teams', true );
 				$element_attr['id']    = $customfield['slug'] . '-teams';
-				$team_forms            = array();
+
+				$team_forms['none'] = __('Select a Team');
 				if ( isset( $customfield['cpublishing_teams'] ) ) {
 
 					$args      = array(
@@ -278,7 +282,8 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 					);
 					$the_query = new WP_Query( $args );
 
-					while ( $the_query->have_posts() ) {
+
+ 					while ( $the_query->have_posts() ) {
 						$the_query->the_post();
 						$team_forms[ get_the_ID() ] = get_the_title();
 					}
