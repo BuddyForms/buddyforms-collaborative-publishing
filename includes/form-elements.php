@@ -244,6 +244,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 			$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_editors', true );
 			$element_attr['id']    = $customfield['slug'] . '-editors';
 
+
 			$element = new Element_Select( $label, 'buddyforms_editors', $options, $element_attr );
 
 			if ( isset( $customfield['multiple_editors'] ) && is_array( $customfield['multiple_editors'] ) ) {

@@ -1,6 +1,6 @@
 <?php
 
-//add_action( 'buddyforms_post_edit_meta_box_select_form', 'buddyforms_cbublishing_invite_new_editor' );
+add_action( 'buddyforms_post_edit_meta_box_select_form', 'buddyforms_cbublishing_invite_new_editor' );
 
 function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 	global $post;
@@ -55,7 +55,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                         }
 
 
-                        var selected = [];
+                        var selected = $('#col-lab-editors').select2('data');
 
                         if (data['old_user_emails']) {
                             jQuery.each(data['old_user_emails'], function (index, element) {
@@ -119,6 +119,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
 
 			<?php
+
 			// Create the form object
 			$form2 = new Form( "buddyforms_invite_new_user" );
 
@@ -132,17 +133,10 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 			$element_attr = array();
 			$label        = __( 'Add email Address you want to invite', 'buddyforms' );
 
-			$element_attr['class'] = $element_attr['class'] . ' bf-select2';
+			$element_attr['class'] = $element_attr['class'] . ' bf-select2-user_invite_email_select';
 			$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_moderators', true );
 
-
 			BuddyFormsAssets::load_select2_assets();
-
-
-			$taxonomy = '';
-			$order    = '';
-			$exclude  = '';
-			$include  = '';
 
 			$args = array(
 				'hide_empty'    => 0,
@@ -150,7 +144,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 				'echo'          => false,
 				'selected'      => false,
 				'name'          => 'user_invite_email_select[]',
-				'class'         => 'postform bf-select2-user_invite_email_select',
+				'class'         => 'postform bf-user_invite_email_select',
 				'depth'         => 0,
 				'tab_index'     => 0,
 				'hide_if_empty' => false,
@@ -180,11 +174,11 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
 
 			$dropdown = str_replace( 'id=', 'data-form="user_invite_email_select" id=', $dropdown );
-			$dropdown = str_replace( 'id=', 'data-placeholder="' . $placeholder . '" id=', $dropdown );
+		//	$dropdown = str_replace( 'id=', 'data-placeholder="' . $placeholder . '" id=', $dropdown );
 			$dropdown = str_replace( 'id=', 'style="width:100%;" id=', $dropdown );
 
 
-			$required = $form2->renderRequired();
+//			$required = $form2->renderRequired();
 
 			$minimumResultsForSearch = '';
 			//$tags                    = 'tags: true,';
@@ -194,8 +188,11 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 			$is_ajax                = true;
 
 			if ( $is_ajax ) {
-				$ajax_options .= $minimumInputLength;
+				$ajax_options .= 'minimumInputLength: 3, ';
 				$ajax_options .= 'ajax:{ ' .
+                                 'success:function(data) {' .
+				                 'console.log(data);' .
+				                 ' }, ' .
 				                 'url: "' . admin_url( 'admin-ajax.php' ) . '", ' .
 				                 'delay: 250, ' .
 				                 'dataType: "json", ' .
@@ -222,7 +219,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 			$dropdown = '
 						<script>
 							jQuery(document).ready(function () {
-							    jQuery(".bf-select2-user_invite_email_select").select2({
+							    jQuery("#bf-user_invite_email_select").select2({
 							            ' . $minimumResultsForSearch . '
 										' . $maximumSelectionLength . '
 										' . $ajax_options . '
@@ -230,14 +227,8 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 										        jQuery(this).data("placeholder");
 										    },
                                      allowClear: true,
-//                                     multiple: "multiple",
-//                                     tags: true,
 							        tokenSeparators: [\',\']
-							    })
-							    jQuery(".bf-select2-user_invite_email_select").on("change", function () {
-							    
-				                     
-				                });
+							    });
 						    });
 						</script>
 						<div class="bf_field_group">
@@ -257,22 +248,6 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 			$form2->render();
 
 			?>
-
-
-            <!--            <table class="form-table">-->
-            <!--				<tbody>-->
-            <!--				<tr>-->
-            <!--					<th><label for="bf_invite_mail_to">Mail to:</label></th>-->
-            <!--					<td><input id="bf_invite_mail_to" type="email" value=""></td>-->
-            <!--				</tr>-->
-            <!--				<tr>-->
-            <!--					<th><label for="bf_invite_mail_subject">Mail Subject</label></th>-->
-            <!--					<td><input id="bf_invite_mail_subject" type="text" value="-->
-			<?php //echo __('You got Invited to edit this post'); ?><!--"></td>-->
-            <!--				</tr>-->
-            <!--				</tbody>-->
-            <!--			</table>-->
-
 
             <br>
             <a id="buddyforms_invite_new_user_as_editor"
