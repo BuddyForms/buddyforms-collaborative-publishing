@@ -9,6 +9,8 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 	?>
 
     <script>
+
+        var ajaxurl = "<?php echo admin_url( 'admin-ajax.php' ); ?>";
         jQuery(document).ready(function () {
             jQuery(document).on("click", '#buddyforms_invite_new_user_as_editor', function (evt) {
 
@@ -55,7 +57,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                         }
 
 
-                        var selected = [];//jQuery('#col-lab-editors').select2('data');
+                        var selected = jQuery('#col-lab-editors').select2('data');
 
                         if (data['old_user_emails']) {
                             jQuery.each(data['old_user_emails'], function (index, element) {
@@ -82,7 +84,6 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                             jQuery('#col-lab-editors').val(selected).trigger('change');
 
                         }
-
                         // jQuery('#buddyforms_invite_wrap').html('<p>Invite send successfully</p>');
                         tb_remove();
 
@@ -178,7 +179,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 			$dropdown = str_replace( 'id=', 'style="width:100%;" id=', $dropdown );
 
 
-			$required = $form2->renderRequired();
+			//$required = $form2->renderRequired();
 
 			$minimumResultsForSearch = '';
 			//$tags                    = 'tags: true,';

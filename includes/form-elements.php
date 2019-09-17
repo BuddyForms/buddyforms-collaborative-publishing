@@ -50,8 +50,8 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				'data-field_id' => $field_id,
 				'shortDesc'     => 'You can enable all users or filter the select for a specific user role'
 			) );
-			$multiple_editors                                    = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_editors'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_editors'] : 'false';
-			$form_fields['general']['multiple_editors']          = new Element_Checkbox( '<b>' . __( 'Multiple Editors', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_editors]", array( 'multiple_editors' => '<b>' . __( 'Multiple Editors', 'buddyforms' ) . '</b>' ), array( 'value' => $multiple_editors ) );
+//			$multiple_editors                                    = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_editors'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_editors'] : 'false';
+//			$form_fields['general']['multiple_editors']          = new Element_Checkbox( '<b>' . __( 'Multiple Editors', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_editors]", array( 'multiple_editors' => '<b>' . __( 'Multiple Editors', 'buddyforms' ) . '</b>' ), array( 'value' => $multiple_editors ) );
 			$cpublishing_editors_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors_label'] ) : __( 'Select Editors', 'buddyforms' );
 			$form_fields['general']['cpublishing_editors_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_editors_label]", array(
 				'data'      => $field_id,
@@ -242,14 +242,14 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 			$element_attr['class'] = $element_attr['class'] . ' bf-select2';
 			$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_editors', true );
-			$element_attr['id']    = $customfield['slug'] . '-editors';
+			$element_attr['id']    = 'col-lab-editors';
 
 
 			$element = new Element_Select( $label, 'buddyforms_editors', $options, $element_attr );
 
-			if ( isset( $customfield['multiple_editors'] ) && is_array( $customfield['multiple_editors'] ) ) {
+			//if ( isset( $customfield['multiple_editors'] ) && is_array( $customfield['multiple_editors'] ) ) {
 				$element->setAttribute( 'multiple', 'multiple' );
-			}
+			//}
 
 			BuddyFormsAssets::load_select2_assets();
 
@@ -333,7 +333,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 
 /*
- * Save MailPoet Fields
+ * Save Fields
  *
  */
 add_action( 'buddyforms_update_post_meta', 'buddyforms_cpublishing_update_post_meta', 10, 2 );
