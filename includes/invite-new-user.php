@@ -1,6 +1,6 @@
 <?php
 
-add_action( 'buddyforms_post_edit_meta_box_select_form', 'buddyforms_cbublishing_invite_new_editor' );
+//add_action( 'buddyforms_post_edit_meta_box_select_form', 'buddyforms_cbublishing_invite_new_editor' );
 
 function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 	global $post;
@@ -55,7 +55,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                         }
 
 
-                        var selected = $('#col-lab-editors').select2('data');
+                        var selected = [];//jQuery('#col-lab-editors').select2('data');
 
                         if (data['old_user_emails']) {
                             jQuery.each(data['old_user_emails'], function (index, element) {
@@ -144,7 +144,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 				'echo'          => false,
 				'selected'      => false,
 				'name'          => 'user_invite_email_select[]',
-				'class'         => 'postform bf-user_invite_email_select',
+				'class'         => 'postform bf-select2-user_invite_email_select',
 				'depth'         => 0,
 				'tab_index'     => 0,
 				'hide_if_empty' => false,
@@ -174,11 +174,11 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
 
 			$dropdown = str_replace( 'id=', 'data-form="user_invite_email_select" id=', $dropdown );
-		//	$dropdown = str_replace( 'id=', 'data-placeholder="' . $placeholder . '" id=', $dropdown );
+			$dropdown = str_replace( 'id=', 'data-placeholder="' . $placeholder . '" id=', $dropdown );
 			$dropdown = str_replace( 'id=', 'style="width:100%;" id=', $dropdown );
 
 
-//			$required = $form2->renderRequired();
+			$required = $form2->renderRequired();
 
 			$minimumResultsForSearch = '';
 			//$tags                    = 'tags: true,';
@@ -188,7 +188,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 			$is_ajax                = true;
 
 			if ( $is_ajax ) {
-				$ajax_options .= 'minimumInputLength: 3, ';
+				$ajax_options .= $minimumInputLength;
 				$ajax_options .= 'ajax:{ ' .
                                  'success:function(data) {' .
 				                 'console.log(data);' .
@@ -219,7 +219,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 			$dropdown = '
 						<script>
 							jQuery(document).ready(function () {
-							    jQuery("#bf-user_invite_email_select").select2({
+							    jQuery(".bf-select2-user_invite_email_select").select2({
 							            ' . $minimumResultsForSearch . '
 										' . $maximumSelectionLength . '
 										' . $ajax_options . '
