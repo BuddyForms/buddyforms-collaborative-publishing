@@ -34,11 +34,17 @@ function buddyforms_cpublishing_list_editor_posts( $args ) {
 
 	$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
 
-	$the_lp_query = new WP_Query( array( 'post__in' => $user_posts ) );
+//	print_r( $user_posts );
 
-	buddyforms_locate_template( 'the-loop' );
 
-	wp_reset_postdata();
+	if ( $user_posts ) {
+		$the_lp_query = new WP_Query( array( 'post__in' => $user_posts, 'post_status' => 'any', 'post_type' => 'any' ) );
+		buddyforms_locate_template( 'the-loop' );
+		wp_reset_postdata();
+	} else {
+		echo '<p>There are no collaborative posts for you to edit.</p>';
+	}
+
 
 	$tmp = ob_get_clean();
 

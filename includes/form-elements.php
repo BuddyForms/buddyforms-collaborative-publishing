@@ -167,6 +167,19 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				'class' => $bf_hide_if_not_invite_by_mail,
 			) );
 
+			$delete_request_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) : __( 'We share a post I like to delete. Please follow the link to approve the delete request.', 'buddyforms' );
+			$form_fields['general']['delete_request_message'] = new Element_Textbox( '<b>' . __( 'Delete Request Message Text', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][delete_request_message]", array(
+				'data'  => $field_id,
+				'value' => $delete_request_message,
+			) );
+
+//			$edit_request_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['edit_request_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['edit_request_message'] ) : __( 'I like to edit this post', 'buddyforms' );
+//			$form_fields['general']['edit_request_message'] = new Element_Textbox( '<b>' . __( 'Edit Request Message Text', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][edit_request_message]", array(
+//				'data'  => $field_id,
+//				'value' => $edit_request_message,
+//			) );
+
+
 			$form_fields['general']['slug']  = new Element_Hidden( "buddyforms_options[form_fields][" . $field_id . "][slug]", 'CPUBLISHING_field_key' );
 			$form_fields['general']['type']  = new Element_Hidden( "buddyforms_options[form_fields][" . $field_id . "][type]", $field_type );
 			$form_fields['general']['order'] = new Element_Hidden( "buddyforms_options[form_fields][" . $field_id . "][order]", $field_position, array( 'id' => 'buddyforms/' . $form_slug . '/form_fields/' . $field_id . '/order' ) );

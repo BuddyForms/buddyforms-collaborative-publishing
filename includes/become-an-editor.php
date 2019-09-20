@@ -33,7 +33,7 @@ function buddyforms_ask_to_become_an_editor() {
 
 		$mail_to = $post_editor_info->user_email;
 
-		$emailBody = $current_user->display_name . ' ask to become an editor of the post: ';
+		$emailBody = $current_user->display_name . ' Ask to become an editor of the post: ';
 
 		$emailBody .= $edit_post_link;
 

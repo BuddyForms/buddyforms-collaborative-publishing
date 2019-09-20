@@ -1,7 +1,7 @@
 <?php
 
 function buddyforms_cbublishing_delete_post( $post_id, $form_slug ) {
-	global $post;
+	global $post, $buddyforms;
 	add_thickbox();
 
 	?>
@@ -10,14 +10,14 @@ function buddyforms_cbublishing_delete_post( $post_id, $form_slug ) {
         jQuery(document).ready(function () {
             jQuery(document).on("click", '#buddyforms_delete_post_as_editor_<?php echo $post_id ?>', function (evt) {
 
-                var bf_delete_mail_subject = jQuery('#bf_delete_mail_subject_<?php echo $post_id ?>').val();
-                var bf_delete_mail_message = jQuery('#bf_delete_mail_message_<?php echo $post_id ?>').val();
+                var post_delete_email_subject = jQuery('#post_delete_email_subject_<?php echo $post_id ?>').val();
+                var post_delete_email_message = jQuery('#post_delete_email_message_<?php echo $post_id ?>').val();
 
-                if (bf_delete_mail_subject == '') {
+                if (post_delete_email_subject == '') {
                     alert('Mail Subject is a required field');
                     return false;
                 }
-                if (bf_delete_mail_message == '') {
+                if (post_delete_email_message == '') {
                     alert('Message is a required field');
                     return false;
                 }
@@ -33,8 +33,8 @@ function buddyforms_cbublishing_delete_post( $post_id, $form_slug ) {
                         "action": "buddyforms_delete_post_as_editor",
                         "post_id": post_id,
                         "form_slug": form_slug,
-                        "bf_delete_mail_subject": bf_delete_mail_subject,
-                        "bf_delete_mail_message": bf_delete_mail_message
+                        "post_delete_email_subject": post_delete_email_subject,
+                        "post_delete_email_message": post_delete_email_message
                     },
                     success: function (data) {
 
@@ -82,8 +82,18 @@ function buddyforms_cbublishing_delete_post( $post_id, $form_slug ) {
 				"prevent" => array( "bootstrap", "jQuery", "focus" ),
 				'method'  => 'post'
 			) );
-			$delete_form->addElement( new Element_Textbox( 'Subject', 'post_delete_email_subject', array( 'value' => 'Delete Post Request' ) ) );
-			$delete_form->addElement( new Element_Textarea( 'Add a Message', 'post_delete_email_message', array( 'value' => 'We share a post I like to delete. Please follow the link to approve the delete request.' ) ) );
+			$delete_form->addElement( new Element_Textbox( 'Subject', 'post_delete_email_subject_' . $post_id, array( 'value' => 'Delete Post Request' ) ) );
+
+			$delete_request_message = '';
+			if ( isset( $buddyforms[$form_slug]['form_fields'] ) ) {
+				foreach ( $buddyforms[$form_slug]['form_fields'] as $key => $form_field ) {
+					if ( $form_field['type'] == 'collaborative-publishing' ) {
+						$delete_request_message = $form_field['delete_request_message'];
+					}
+				}
+			}
+
+			$delete_form->addElement( new Element_Textarea( 'Add a Message', 'post_delete_email_message_' . $post_id , array( 'value' => $delete_request_message, 'class' => 'collaburative-publishiing-message' ) ) );
 
 
 			$delete_form->render();
@@ -164,13 +174,13 @@ function buddyforms_delete_post_as_editor() {
 
 		$mail_to = $post_editor_info->user_email;
 
-		$emailBody = $_POST['post_delete_email_subject'];
+		$emailBody = $_POST['post_delete_email_message'];
 
 		//$emailBody .= ' ' . $edit_post_link;
 
 
-		$emailBody .= ' Link to the post <a href="' . $permalink . '">' . $the_post->post_title . '</a>';
-		$emailBody .= ' approve delete now <a href="' . $delete_post_link . '">Yes, Delete Now</a>';
+		$emailBody .= ' <br>Link to the post: <a href="' . $permalink . '">' . $the_post->post_title . '</a><br>';
+		$emailBody .= ' Approve delete Request: <a href="' . $delete_post_link . '">Yes, Delete Now</a>';
 
 
 //	$post       = get_post( $post_id );
@@ -207,7 +217,7 @@ add_action( 'init', 'buddyforms_delete_post_request' );
 
 function buddyforms_delete_post_request() {
 
-	if ( $_GET['bf_delete_post_request'] ) {
+	if ( isset($_GET['bf_delete_post_request']) ) {
 
 		$key     = $_GET['key'];
 		$post_id = $_GET['bf_delete_post_request'];

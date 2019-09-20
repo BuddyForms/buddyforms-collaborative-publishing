@@ -3,7 +3,7 @@
 //add_action( 'buddyforms_post_edit_meta_box_select_form', 'buddyforms_cbublishing_invite_new_editor' );
 
 function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
-	global $post;
+	global $post, $buddyforms;
 	add_thickbox();
 
 	?>
@@ -18,17 +18,17 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                 var user_invite_email_select = jQuery('#user_invite_email_select').val();
 
                 var bf_invite_mail_to = jQuery('#bf_invite_mail_to').val();
-                var bf_invite_mail_subject = jQuery('#bf_invite_mail_subject').val();
-                var bf_invite_mail_message = jQuery('#bf_invite_mail_message').val();
+                //var bf_invite_mail_subject = jQuery('#bf_invite_mail_subject').val();
+                var bf_invite_mail_message = jQuery('#user_invite_email_message').val();
 
                 if (bf_invite_mail_to == '') {
                     alert('Mail to is a required field, you need to select at leased one mail address');
                     return false;
                 }
-                if (bf_invite_mail_subject == '') {
-                    alert('Mail Subject is a required field');
-                    return false;
-                }
+                // if (bf_invite_mail_subject == '') {
+                //     alert('Mail Subject is a required field');
+                //     return false;
+                // }
                 if (bf_invite_mail_message == '') {
                     alert('Message is a required field');
                     return false;
@@ -46,7 +46,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
                         "post_id": post_id,
                         "form_slug": form_slug,
                         "user_invite_email_select": user_invite_email_select,
-                        "bf_invite_mail_message": bf_invite_mail_message
+                        "user_invite_email_message": bf_invite_mail_message
                     },
                     success: function (data) {
 
@@ -59,7 +59,8 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
                         var selected = jQuery('#col-lab-editors').select2('data');
 
-                        if (data['old_user_emails']) {
+
+                        if (data['old_user_emails'].length > 0) {
                             jQuery.each(data['old_user_emails'], function (index, element) {
                                 console.log(index + ' - ' + element);
 
@@ -243,7 +244,17 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
 			$form2->addElement( new Element_HTML( $dropdown ) );
 
-			$form2->addElement( new Element_Textarea( 'Invite Message Text', 'user_invite_email_message', array('value' => 'Message text') ) );
+
+
+            		if ( isset( $buddyforms[$form_slug]['form_fields'] ) ) {
+			            foreach ( $buddyforms[$form_slug]['form_fields'] as $key => $form_field ) {
+				            if ( $form_field['type'] == 'collaborative-publishing' ) {
+					            $invite_message = $form_field['invite_message'];
+				            }
+			            }
+		            }
+
+			$form2->addElement( new Element_Textarea( 'Invite Message Text', 'user_invite_email_message', array('value' => $invite_message, 'class' => 'collaburative-publishiing-message') ) );
 
 
 			$form2->render();
@@ -302,9 +313,9 @@ function buddyforms_invite_new_user_as_editor() {
 
 		$mail_to = $old_user_email;
 
-		$emailBody = $_POST['bf_invite_mail_message'];
+		$emailBody = $_POST['user_invite_email_message'];
 
-		$emailBody .= $edit_post_link;
+		$emailBody .= ' ' . $edit_post_link;
 
 //	$post       = get_post( $post_id );
 //	$post_title = $post->post_title;
@@ -364,9 +375,9 @@ function buddyforms_invite_new_user_as_editor() {
 
 		$mail_to = $new_user_email;
 
-		$emailBody = $_POST['bf_invite_mail_message'];
+		$emailBody = $_POST['user_invite_email_message'];
 
-		$emailBody .= $activation_link;
+		$emailBody .= ' ' . $activation_link;
 
 //	$post       = get_post( $post_id );
 //	$post_title = $post->post_title;
