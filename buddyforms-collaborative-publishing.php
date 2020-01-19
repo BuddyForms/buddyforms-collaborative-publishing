@@ -9,7 +9,7 @@
  * Author URI: https://themekraft.com/
  * License: GPLv2 or later
  * Network: false
- * Text Domain: buddyforms
+ * Text Domain: buddyforms-collaborative-publishing
  *
  *****************************************************************************
  *
@@ -35,7 +35,9 @@ class BuddyFormsCPublishing {
 	/**
 	 * @var string
 	 */
-	public $version = '1.0.0';
+	public static $version = '1.0.0';
+	public static $include_assets = false;
+	public static $slug = 'buddyforms-collaborative-publishing';
 
 	/**
 	 * Initiate the class
@@ -70,7 +72,6 @@ class BuddyFormsCPublishing {
 		if ( ! defined( 'BUDDYFORMS_CPUBLISHING_INCLUDES_PATH' ) ) {
 			define( 'BUDDYFORMS_CPUBLISHING_INCLUDES_PATH', BUDDYFORMS_CPUBLISHING_INSTALL_PATH . 'includes/' );
 		}
-
 	}
 
 	/**
@@ -80,7 +81,6 @@ class BuddyFormsCPublishing {
 	 * @since 1.0
 	 */
 	public function includes() {
-
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'form-elements.php';
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'functions.php';
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'invite-new-user.php';
@@ -88,7 +88,44 @@ class BuddyFormsCPublishing {
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'user-taxonomy.php';
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'become-an-editor.php';
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'delete-post.php';
+	}
 
+	public static function error_log( $message ) {
+		if ( ! empty( $message ) ) {
+			error_log( self::getSlug() . ' -- ' . $message );
+		}
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getNeedAssets() {
+		return self::$include_assets;
+	}
+
+	/**
+	 * @param string $include_assets
+	 */
+	public static function setNeedAssets( $include_assets ) {
+		self::$include_assets = $include_assets;
+	}
+
+	/**
+	 * Get plugin version
+	 *
+	 * @return string
+	 */
+	static function getVersion() {
+		return self::$version;
+	}
+
+	/**
+	 * Get plugins slug
+	 *
+	 * @return string
+	 */
+	static function getSlug() {
+		return self::$slug;
 	}
 
 	/**
@@ -98,7 +135,7 @@ class BuddyFormsCPublishing {
 	 * @since 1.0
 	 */
 	public function load_plugin_textdomain() {
-		load_plugin_textdomain( 'buddyforms', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+		load_plugin_textdomain( 'buddyforms-collaborative-publishing', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 
 	public function admin_js_css_enqueue() {
