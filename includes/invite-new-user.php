@@ -4,99 +4,8 @@
 
 function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 	global $post, $buddyforms;
-	add_thickbox();
-
+	$description = '';
 	?>
-
-    <script>
-
-        var ajaxurl = "<?php echo admin_url( 'admin-ajax.php' ); ?>";
-        jQuery(document).ready(function () {
-            jQuery(document).on("click", '#buddyforms_invite_new_user_as_editor', function (evt) {
-
-
-                var user_invite_email_select = jQuery('#user_invite_email_select').val();
-
-                var bf_invite_mail_to = jQuery('#bf_invite_mail_to').val();
-                //var bf_invite_mail_subject = jQuery('#bf_invite_mail_subject').val();
-                var bf_invite_mail_message = jQuery('#user_invite_email_message').val();
-
-                if (bf_invite_mail_to == '') {
-                    alert('Mail to is a required field, you need to select at leased one mail address');
-                    return false;
-                }
-                // if (bf_invite_mail_subject == '') {
-                //     alert('Mail Subject is a required field');
-                //     return false;
-                // }
-                if (bf_invite_mail_message == '') {
-                    alert('Message is a required field');
-                    return false;
-                }
-
-                var post_id = jQuery('#buddyforms_invite_new_user_as_editor').attr("data-post_id");
-                var form_slug = jQuery('#buddyforms_invite_new_user_as_editor').attr("data-form_slug");
-
-                jQuery.ajax({
-                    type: 'POST',
-                    dataType: "json",
-                    url: ajaxurl,
-                    data: {
-                        "action": "buddyforms_invite_new_user_as_editor",
-                        "post_id": post_id,
-                        "form_slug": form_slug,
-                        "user_invite_email_select": user_invite_email_select,
-                        "user_invite_email_message": bf_invite_mail_message
-                    },
-                    success: function (data) {
-
-                        console.log(data);
-
-                        if (data['new_user_email_html']) {
-                            jQuery('#buddyforms_panding_invites_list').html(data['new_user_email_html']);
-                        }
-
-
-                        var selected = jQuery('#col-lab-editors').select2('data');
-
-
-                        if (data['old_user_emails'].length > 0) {
-                            jQuery.each(data['old_user_emails'], function (index, element) {
-                                console.log(index + ' - ' + element);
-
-                                var data2 = {
-                                    id: index,
-                                    text: element
-                                };
-
-                                // Set the value, creating a new option if necessary
-                                if (jQuery('#col-lab-editors').find("option[value='" + data2.id + "']").length) {
-                                    selected.push(data2.id);
-                                } else {
-                                    // Create a DOM Option and pre-select by default
-                                    var newOption = new Option(data2.text, data2.id, true, true);
-                                    // Append it to the select
-                                    jQuery('#col-lab-editors').append(newOption).trigger('change');
-                                }
-
-
-                            });
-
-                            jQuery('#col-lab-editors').val(selected).trigger('change');
-
-                        }
-                        // jQuery('#buddyforms_invite_wrap').html('<p>Invite send successfully</p>');
-                        tb_remove();
-
-                    },
-                    error: function (request, status, error) {
-                        alert(request.responseText);
-                    }
-                });
-
-            });
-        });
-    </script>
     <style>
         #buddyforms_invite_wrap input[type="text"] {
             width: 100%;
@@ -107,8 +16,9 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
             height: 96% !important;
         }
     </style>
-    <p><a id="buddyforms_invite" href="#TB_inline?width=800&height=600&inlineId=buddyforms_invite_modal"
-          title="" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms' ) ?></a></p>
+    <p>
+	    <a id="buddyforms_invite" href="#TB_inline?width=800&height=600&inlineId=buddyforms_invite_modal" title="" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms-collaborative-publishing') ?></a>
+    </p>
 
     <div id="buddyforms_panding_invites">
         <p>Pending Invites</p>
@@ -118,13 +28,9 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
     <div id="buddyforms_invite_modal" style="display:none;">
         <div id="buddyforms_invite_wrap">
-
-
 			<?php
-
 			// Create the form object
 			$form2 = new Form( "buddyforms_invite_new_user" );
-
 
 			// Set the form attribute
 			$form2->configure( array(
@@ -132,8 +38,8 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 				'method'  => 'post'
 			) );
 
-			$element_attr = array();
-			$label        = __( 'Add email Address you want to invite', 'buddyforms' );
+			$element_attr = array('class' => ' bf-select2-user_invite_email_select' );
+			$label        = __( 'Add email Address you want to invite', 'buddyforms-collaborative-publishing');
 
 			$element_attr['class'] = $element_attr['class'] . ' bf-select2-user_invite_email_select';
 			$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_moderators', true );
@@ -256,7 +162,6 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
 			$form2->addElement( new Element_Textarea( 'Invite Message Text', 'user_invite_email_message', array('value' => $invite_message, 'class' => 'collaburative-publishiing-message') ) );
 
-
 			$form2->render();
 
 			?>
@@ -278,7 +183,7 @@ function buddyforms_invite_new_user_as_editor() {
 	global $buddyforms;
 
 	if ( ! isset( $_POST['post_id'] ) ) {
-		echo __( 'There has been an error sending the message No post to edit is selected!', 'buddyforms' );
+		echo __( 'There has been an error sending the message No post to edit is selected!', 'buddyforms-collaborative-publishing');
 		die();
 
 		return;
@@ -306,8 +211,8 @@ function buddyforms_invite_new_user_as_editor() {
 		$permalink = apply_filters( 'buddyforms_the_loop_edit_permalink', $permalink, $buddyforms[ $_POST['form_slug'] ]['attached_page'] );
 
 //		$edit_post_link = buddyforms_edit_post_link( $text = null, $before = '', $after = '', $_POST['post_id'], $echo = false );
-//		$edit_post_link  = apply_filters( 'buddyforms_loop_edit_post_link', buddyforms_edit_post_link( '<span aria-label="' . __( 'Edit', 'buddyforms' ) . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms' ), '', '', 0, false), $_POST['post_id'], $_POST['form_slug'] );
-		$edit_post_link = apply_filters( 'buddyforms_loop_edit_post_link', '<a title="' . __( 'Edit', 'buddyforms' ) . '" id="' . $_POST['post_id'] . '" class="bf_edit_post" href="' . $permalink . 'edit/' . $_POST['form_slug'] . '/' . $_POST['post_id'] . '"><span aria-label="' . __( 'Edit', 'buddyforms' ) . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms' ) . '</a>', $_POST['post_id'] );
+//		$edit_post_link  = apply_filters( 'buddyforms_loop_edit_post_link', buddyforms_edit_post_link( '<span aria-label="' . __( 'Edit', 'buddyforms-collaborative-publishing') . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms-collaborative-publishing'), '', '', 0, false), $_POST['post_id'], $_POST['form_slug'] );
+		$edit_post_link = apply_filters( 'buddyforms_loop_edit_post_link', '<a title="' . __( 'Edit', 'buddyforms-collaborative-publishing') . '" id="' . $_POST['post_id'] . '" class="bf_edit_post" href="' . $permalink . 'edit/' . $_POST['form_slug'] . '/' . $_POST['post_id'] . '"><span aria-label="' . __( 'Edit', 'buddyforms-collaborative-publishing') . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms-collaborative-publishing') . '</a>', $_POST['post_id'] );
 		// Now let us send the mail
 		$subject = __( 'You got an invite to edit' );
 
@@ -402,7 +307,7 @@ function buddyforms_invite_new_user_as_editor() {
 
 
 //	if ( ! $result ) {
-//		echo __( 'There has been an error sending the message!', 'buddyforms' );
+//		echo __( 'There has been an error sending the message!', 'buddyforms-collaborative-publishing');
 //	}
 
 	$json['old_user_emails']     = $old_user_emails;

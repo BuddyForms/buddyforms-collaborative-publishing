@@ -36,7 +36,7 @@ class BuddyFormsCPublishing {
 	 * @var string
 	 */
 	public static $version = '1.0.0';
-	public static $include_assets = false;
+	public static $include_assets = array();
 	public static $slug = 'buddyforms-collaborative-publishing';
 
 	/**
@@ -46,12 +46,53 @@ class BuddyFormsCPublishing {
 	 * @since 0.1
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'includes' ), 4, 1 );
-		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
-		add_action( 'buddyforms_admin_js_css_enqueue', array( $this, 'admin_js_css_enqueue' ) );
-		add_action( 'buddyforms_front_js_css_after_enqueue', array( $this, 'buddyforms_front_js_css_enqueue' ) );
+		if ( self::is_buddy_form_active() ) {
+			add_action( 'init', array( $this, 'includes' ), 4, 1 );
+			add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
+			add_action( 'buddyforms_admin_js_css_enqueue', array( $this, 'admin_js_css_enqueue' ) );
 
-		$this->load_constants();
+			add_action( 'buddyforms_front_js_css_after_enqueue', array( $this, 'buddyforms_collaborative_publishing_needs_assets' ), 10, 2 );
+			add_action( 'wp_footer', array( $this, 'buddyforms_front_js_css_enqueue' ) );
+
+			$this->load_constants();
+		} else {
+			add_action( 'admin_notices', array( $this, 'need_buddyforms' ) );
+		}
+	}
+
+	public function buddyforms_collaborative_publishing_needs_assets( $content, $form_slug ) {
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && defined( 'DOING_CRON' ) && DOING_CRON ) {
+			return;
+		}
+		if ( empty( $form_slug ) ) {
+			return;
+		}
+
+		global $buddyforms;
+
+		if ( empty( $buddyforms[ $form_slug ] ) ) {
+			return;
+		}
+
+		if ( ! function_exists( 'buddyforms_exist_field_type_in_form' ) ) {
+			return;
+		}
+
+		//check if the field exist
+		$exist_field = buddyforms_exist_field_type_in_form( $form_slug, 'collaborative-publishing' );
+
+		$needs_assets = ( $exist_field == true );
+		BuddyFormsCPublishing::setNeedAssets( $needs_assets, $form_slug );
+	}
+
+	public static function load_plugins_dependency() {
+		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+	}
+
+	public static function is_buddy_form_active() {
+		self::load_plugins_dependency();
+
+		return is_plugin_active( 'buddyforms-premium/BuddyForms.php' );
 	}
 
 	/**
@@ -90,6 +131,12 @@ class BuddyFormsCPublishing {
 		require_once BUDDYFORMS_CPUBLISHING_INCLUDES_PATH . 'delete-post.php';
 	}
 
+	public function need_buddyforms() {
+		?>
+		<div class="notice notice-error"><p>Need <strong>BuddyForms Professional</strong> activated. Minimum version <i>2.5.10</i> required.</p></div>
+		<?php
+	}
+
 	public static function error_log( $message ) {
 		if ( ! empty( $message ) ) {
 			error_log( self::getSlug() . ' -- ' . $message );
@@ -100,14 +147,19 @@ class BuddyFormsCPublishing {
 	 * @return string
 	 */
 	public static function getNeedAssets() {
-		return self::$include_assets;
+		if ( empty( self::$include_assets ) ) {
+			return false;
+		}
+
+		return in_array( true, self::$include_assets, true );
 	}
 
 	/**
 	 * @param string $include_assets
+	 * @param string $form_slug
 	 */
-	public static function setNeedAssets( $include_assets ) {
-		self::$include_assets = $include_assets;
+	public static function setNeedAssets( $include_assets, $form_slug ) {
+		self::$include_assets[ $form_slug ] = $include_assets;
 	}
 
 	/**
@@ -139,12 +191,30 @@ class BuddyFormsCPublishing {
 	}
 
 	public function admin_js_css_enqueue() {
-		wp_enqueue_script( 'buddyforms-cpublishing-form-builder-js', plugins_url( 'assets/admin/js/form-builder.js', __FILE__ ), array( 'jquery' ) );
-		wp_enqueue_style( 'buddyforms-cpublishing-form-builder-css', plugins_url( 'assets/admin/css/form-builder.css', __FILE__ ) );
+		wp_enqueue_script( 'buddyforms-cpublishing-form-builder-js', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/admin/js/form-builder.js', array( 'jquery' ) );
+		wp_enqueue_style( 'buddyforms-cpublishing-form-builder-css', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/admin/css/form-builder.css' );
 	}
 
 	function buddyforms_front_js_css_enqueue() {
-		wp_enqueue_script( 'buddyforms-collaborative-js', plugins_url( 'assets/js/collaborative.js', __FILE__ ), array( 'jquery' ) );
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && defined( 'DOING_CRON' ) && DOING_CRON ) {
+			return;
+		}
+		if ( BuddyFormsCPublishing::getNeedAssets() ) {
+			wp_enqueue_script( 'buddyforms-collaborative-script', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/js/script.js', array( 'jquery' ) );
+			wp_localize_script( 'buddyforms-collaborative-script', 'buddyformsCollaborativePublishingObj', array(
+				'ajax'     => admin_url( 'admin-ajax.php' ),
+				'nonce'    => wp_create_nonce( __DIR__ . 'bf_collaborative_publishing' ),
+				'language' => apply_filters( 'bf_collaborative_publishing_language', array(
+					'edit_request_in_process' => apply_filters( 'bf_collaborative_publishing_edit_request_process_string', __( 'Edit Request in Process.', 'buddyforms-collaborative-publishing' ) ),
+					'remove_as_editor'        => apply_filters( 'bf_collaborative_publishing_remove_as_editor_string', __( 'Are you sure to remove as Editor', 'buddyforms-collaborative-publishing' ) ),
+					'remove_post'             => apply_filters( 'bf_collaborative_publishing_remove_post_string', __( 'Are you sure to delete the Post?', 'buddyforms-collaborative-publishing' ) ),
+					'invalid_invite_editors'  => apply_filters( 'bf_collaborative_publishing_invalid_invite_editors_string', __( 'You need to select a valid user or type a valid email.', 'buddyforms-collaborative-publishing' ) ),
+					'invalid_invite_message'  => apply_filters( 'bf_collaborative_publishing_invalid_invite_message_string', __( 'Message is a required field.', 'buddyforms-collaborative-publishing' ) ),
+					'popup_loading'           => apply_filters( 'bf_collaborative_publishing_modal_loading_string', __( 'Loading...', 'buddyforms-collaborative-publishing' ) ),
+				) )
+			) );
+			add_thickbox();
+		}
 	}
 
 }
