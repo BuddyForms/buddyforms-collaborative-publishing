@@ -191,8 +191,8 @@ class BuddyFormsCPublishing {
 	}
 
 	public function admin_js_css_enqueue() {
-		wp_enqueue_script( 'buddyforms-cpublishing-form-builder-js', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/admin/js/form-builder.js', array( 'jquery' ) );
-		wp_enqueue_style( 'buddyforms-cpublishing-form-builder-css', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/admin/css/form-builder.css' );
+		wp_enqueue_script( 'buddyforms-cpublishing-form-builder-js', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/admin/js/form-builder.js', array( 'jquery' ), self::getVersion() );
+		wp_enqueue_style( 'buddyforms-cpublishing-form-builder-css', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/admin/css/form-builder.css', self::getVersion() );
 	}
 
 	function buddyforms_front_js_css_enqueue() {
@@ -200,10 +200,11 @@ class BuddyFormsCPublishing {
 			return;
 		}
 		if ( BuddyFormsCPublishing::getNeedAssets() ) {
-			wp_enqueue_script( 'buddyforms-collaborative-script', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/js/script.js', array( 'jquery' ) );
+			wp_enqueue_script( 'buddyforms-collaborative-script', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/js/script.js', array( 'jquery' ), self::getVersion() );
+			wp_enqueue_style( 'buddyforms-collaborative-style', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/css/style.css',  array(), self::getVersion() );
 			wp_localize_script( 'buddyforms-collaborative-script', 'buddyformsCollaborativePublishingObj', array(
 				'ajax'     => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( __DIR__ . 'bf_collaborative_publishing' ),
+				'nonce'    => wp_create_nonce( BUDDYFORMS_CPUBLISHING_INSTALL_PATH . 'bf_collaborative_publishing' ),
 				'language' => apply_filters( 'bf_collaborative_publishing_language', array(
 					'edit_request_in_process' => apply_filters( 'bf_collaborative_publishing_edit_request_process_string', __( 'Edit Request in Process.', 'buddyforms-collaborative-publishing' ) ),
 					'remove_as_editor'        => apply_filters( 'bf_collaborative_publishing_remove_as_editor_string', __( 'Are you sure to remove as Editor', 'buddyforms-collaborative-publishing' ) ),

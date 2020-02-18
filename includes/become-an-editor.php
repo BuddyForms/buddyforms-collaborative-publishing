@@ -20,7 +20,7 @@ function buddyforms_ask_to_become_an_editor() {
 	foreach ( $post_editors as $post_editor ) {
 
 		$permalink = get_permalink( $buddyforms[ $form_slug ]['attached_page'] );
-		$permalink = apply_filters( 'buddyforms_the_loop_edit_permalink', $permalink, $buddyforms[ $form_slug ]['attached_page'] );
+		$permalink = apply_filters( 'buddyforms_the_loop_edit_permalink', $permalink, $buddyforms[ $form_slug ]['attached_page'], $form_slug );
 
 //		$edit_post_link = buddyforms_edit_post_link( $text = null, $before = '', $after = '', $post_id, $echo = false );
 //		$edit_post_link  = apply_filters( 'buddyforms_loop_edit_post_link', buddyforms_edit_post_link( '<span aria-label="' . __( 'Edit', 'buddyforms' ) . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms' ), '', '', 0, false), $post_id, $form_slug );

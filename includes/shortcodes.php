@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Add a shortcode to invite new users as editors to my post.
+ * Add a shortcode to invite new users as editors to a post.
  *
  * @param $args
  *

@@ -4,31 +4,38 @@
 
 function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 	global $post, $buddyforms;
-	$description = '';
+	$description     = '';
+	$new_user_emails = get_post_meta( $post_id, 'buddyforms_new_user_emails', true );
 	?>
-    <style>
-        #buddyforms_invite_wrap input[type="text"] {
-            width: 100%;
-        }
+	<p>
+		<a id="buddyforms_invite" href="#TB_inline?width=800&height=auto&inlineId=buddyforms_invite_modal" title="" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms-collaborative-publishing' ) ?></a>
+	</p>
 
-        div#TB_ajaxContent {
-            width: 96% !important;
-            height: 96% !important;
-        }
-    </style>
-    <p>
-	    <a id="buddyforms_invite" href="#TB_inline?width=800&height=600&inlineId=buddyforms_invite_modal" title="" class="thickbox button"><?php _e( 'Invite People as Editors', 'buddyforms-collaborative-publishing') ?></a>
-    </p>
+	<div id="buddyforms_panding_invites">
+		<p><strong><?php echo __( 'Pending Invites', 'buddyforms-collaborative-publishing' ) ?></strong></p>
+		<div>
+			<ul id="buddyforms_pending_invites_list">
+				<?php
+				if ( ! empty( $new_user_emails ) ) {
+					foreach ( $new_user_emails as $new_user_email ) {
+						echo sprintf( "<li>%s</li>", esc_attr( $new_user_email ) );
+					}
+				}
+				?>
+			</ul>
+		</div>
+	</div>
 
-    <div id="buddyforms_panding_invites">
-        <p>Pending Invites</p>
-        <div id="buddyforms_panding_invites_list">
-        </div>
-    </div>
-
-    <div id="buddyforms_invite_modal" style="display:none;">
-        <div id="buddyforms_invite_wrap">
+	<div id="buddyforms_invite_modal" style="display:none;">
+		<div id="buddyforms_invite_wrap">
 			<?php
+			//Load collaborative field needed options
+			$invite_message = __( 'You got an invite to edit a post', 'buddyforms-collaborative-publishing' );
+			$field_options  = buddyforms_get_form_field_by( $form_slug, 'collaborative-publishing', 'type' );
+			if ( ! empty( $field_options ) ) {
+				$invite_message = ! empty( $field_options['invite_message'] ) ? $field_options['invite_message'] : __( 'You got an invite to edit a post', 'buddyforms-collaborative-publishing' );
+			}
+
 			// Create the form object
 			$form2 = new Form( "buddyforms_invite_new_user" );
 
@@ -38,8 +45,8 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 				'method'  => 'post'
 			) );
 
-			$element_attr = array('class' => ' bf-select2-user_invite_email_select' );
-			$label        = __( 'Add email Address you want to invite', 'buddyforms-collaborative-publishing');
+			$element_attr = array( 'class' => ' bf-select2-user_invite_email_select' );
+			$label        = __( 'Add email Address you want to invite', 'buddyforms-collaborative-publishing' );
 
 			$element_attr['class'] = $element_attr['class'] . ' bf-select2-user_invite_email_select';
 			$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_moderators', true );
@@ -59,7 +66,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 				'allowClear'    => true,
 			);
 
-			$placeholder = 'Select User';
+			$placeholder = __( 'Type to search', 'buddyforms-collaborative-publishing' );
 
 			$args = array_merge( $args, Array(
 				'multiple'          => 'multiple',
@@ -69,22 +76,19 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 			) );
 
 
-			$args = apply_filters( 'buddyforms_wp_dropdown_users_args', $args, $post_id );
+			$args = apply_filters( 'buddyforms_collaborative_publishing_wp_dropdown_users_args', $args, $post_id );
 
 			$dropdown = wp_dropdown_users( $args );
 
 			// Multiple
 			$dropdown = str_replace( 'id=', 'multiple="multiple" id=', $dropdown );
 
-
 			// Required
 			//$dropdown = str_replace( 'id=', 'required id=', $dropdown );
-
 
 			$dropdown = str_replace( 'id=', 'data-form="user_invite_email_select" id=', $dropdown );
 			$dropdown = str_replace( 'id=', 'data-placeholder="' . $placeholder . '" id=', $dropdown );
 			$dropdown = str_replace( 'id=', 'style="width:100%;" id=', $dropdown );
-
 
 			//$required = $form2->renderRequired();
 
@@ -98,7 +102,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 			if ( $is_ajax ) {
 				$ajax_options .= $minimumInputLength;
 				$ajax_options .= 'ajax:{ ' .
-                                 'success:function(data) {' .
+				                 'success:function(data) {' .
 				                 'console.log(data);' .
 				                 ' }, ' .
 				                 'url: "' . admin_url( 'admin-ajax.php' ) . '", ' .
@@ -110,13 +114,9 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 				                 'var query = { ' .
 				                 'search: params.term, ' .
 				                 'type: "public", ' .
-				                 'action: "bf_load_users", ' .
-				                 'nonce: "' . wp_create_nonce( 'bf_user_loading' ) . '", ' .
-				                 //                                           'form_slug: "user_invite_email_select", ' .
-				                 //				                 'taxonomy: "' . $taxonomy . '", ' .
-				                 //				                 'order: "' . $order . '", ' .
-				                 //				                 'exclude: "' . $exclude . '", ' .
-				                 //				                 'include: "' . $include . '" ' .
+				                 'action: "bf_collaborative_publishing_load_users", ' .
+				                 'form_slug: "' . $form_slug . '", ' .
+				                 'nonce: "' . wp_create_nonce( 'bf_collaborative_publishing_load_users' . __DIR__ ) . '", ' .
 				                 '}; ' .
 				                 'console.log(query);' .
 				                 'return query; ' .
@@ -140,9 +140,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 						    });
 						</script>
 						<div class="bf_field_group">
-	                        <label for="editpost-element-user_invite_email_select">
-	                           Invite Users
-	                        </label>
+	                        <label for="editpost-element-user_invite_email_select"><strong>' . __( 'Invite Users', 'buddyforms-collaborative-publishing' ) . '</strong></label>
 	                        <div class="bf_inputs bf-input">' . $dropdown . '</div>
 		                	<span class="help-inline">' . $description . '</span>
 		                </div>';
@@ -150,228 +148,21 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 
 			$form2->addElement( new Element_HTML( $dropdown ) );
 
-
-
-            		if ( isset( $buddyforms[$form_slug]['form_fields'] ) ) {
-			            foreach ( $buddyforms[$form_slug]['form_fields'] as $key => $form_field ) {
-				            if ( $form_field['type'] == 'collaborative-publishing' ) {
-					            $invite_message = $form_field['invite_message'];
-				            }
-			            }
-		            }
-
-			$form2->addElement( new Element_Textarea( 'Invite Message Text', 'user_invite_email_message', array('value' => $invite_message, 'class' => 'collaburative-publishiing-message') ) );
+			$form2->addElement( new Element_Textarea( __( 'Invite Message Text', 'buddyforms-collaborative-publishing' ), 'user_invite_email_message', array(
+				'value'     => $invite_message,
+				'class'     => 'collaburative-publishiing-message',
+				'rows'      => '15',
+				'shortDesc' => apply_filters( 'buddyforms_collaborative_publishing_message_description', '' ),
+			) ) );
 
 			$form2->render();
 
 			?>
 
-            <br>
-            <a id="buddyforms_invite_new_user_as_editor"
-               data-post_id="<?php echo $post_id ?>"
-               data-form_slug="<?php echo $form_slug ?>"
-               href="#" class="button">Sent Invite</a>
-        </div>
-    </div>
-
+			<br>
+			<button id="buddyforms_invite_new_user_as_editor" data-post_id="<?php echo $post_id ?>" data-form_slug="<?php echo $form_slug ?>" href="#" class="button"><?php echo __( 'Sent Invite', 'buddyforms-collaborative-publishing' ) ?></button>
+		</div>
+	</div>
 	<?php
-
 }
 
-add_action( 'wp_ajax_buddyforms_invite_new_user_as_editor', 'buddyforms_invite_new_user_as_editor' );
-function buddyforms_invite_new_user_as_editor() {
-	global $buddyforms;
-
-	if ( ! isset( $_POST['post_id'] ) ) {
-		echo __( 'There has been an error sending the message No post to edit is selected!', 'buddyforms-collaborative-publishing');
-		die();
-
-		return;
-	}
-
-	$user_invite_email_select = $_POST['user_invite_email_select'];
-
-
-	$new_user_emails = array();
-	$old_user_emails = array();
-	foreach ( $user_invite_email_select as $user ) {
-		if ( substr( $user, 0, 3 ) == 'new' ) {
-			$new_user_email    = substr( $user, 4 );
-			$new_user_emails[] = $new_user_email;
-		} else {
-			$user_info                         = get_userdata( $user );
-			$old_user_emails[ $user_info->ID ] = $user_info->user_email;
-		}
-	}
-
-
-	foreach ( $old_user_emails as $old_user_email ) {
-
-		$permalink = get_permalink( $buddyforms[ $_POST['form_slug'] ]['attached_page'] );
-		$permalink = apply_filters( 'buddyforms_the_loop_edit_permalink', $permalink, $buddyforms[ $_POST['form_slug'] ]['attached_page'] );
-
-//		$edit_post_link = buddyforms_edit_post_link( $text = null, $before = '', $after = '', $_POST['post_id'], $echo = false );
-//		$edit_post_link  = apply_filters( 'buddyforms_loop_edit_post_link', buddyforms_edit_post_link( '<span aria-label="' . __( 'Edit', 'buddyforms-collaborative-publishing') . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms-collaborative-publishing'), '', '', 0, false), $_POST['post_id'], $_POST['form_slug'] );
-		$edit_post_link = apply_filters( 'buddyforms_loop_edit_post_link', '<a title="' . __( 'Edit', 'buddyforms-collaborative-publishing') . '" id="' . $_POST['post_id'] . '" class="bf_edit_post" href="' . $permalink . 'edit/' . $_POST['form_slug'] . '/' . $_POST['post_id'] . '"><span aria-label="' . __( 'Edit', 'buddyforms-collaborative-publishing') . '" class="dashicons dashicons-edit"> </span> ' . __( 'Edit', 'buddyforms-collaborative-publishing') . '</a>', $_POST['post_id'] );
-		// Now let us send the mail
-		$subject = __( 'You got an invite to edit' );
-
-		$mail_to = $old_user_email;
-
-		$emailBody = $_POST['user_invite_email_message'];
-
-		$emailBody .= ' ' . $edit_post_link;
-
-//	$post       = get_post( $post_id );
-//	$post_title = $post->post_title;
-//	$postperma  = get_permalink( $post->ID );
-
-
-		$from_email = get_option( 'admin_email' );
-
-
-		$mailheaders = "MIME-Version: 1.0\n";
-		$mailheaders .= "X-Priority: 1\n";
-		$mailheaders .= "Content-Type: text/html; charset=\"UTF-8\"\n";
-		$mailheaders .= "Content-Transfer-Encoding: 7bit\n\n";
-		$mailheaders .= "From: " . $from_email . "<" . $from_email . ">" . "\r\n";
-
-		$message = '<html><head></head><body>' . $emailBody . '</body></html>';
-
-		$result = wp_mail( $mail_to, $subject, $message, $mailheaders );
-//		}
-
-	}
-
-
-	// Register new User
-	$new_user_email_html = '';
-	foreach ( $new_user_emails as $new_user_email ) {
-		$new_user_email_html .= '<p>' . $new_user_email . '</p>';
-
-//		$user_pass = $pass_confirm = wp_generate_password( 12, true );
-//		$user_role = 'subscriber';
-//		$new_user_id = wp_insert_user( array(
-//			'user_pass'       => $user_pass,
-//			'user_email'      => $new_user_email,
-//			'user_login'      => $new_user_email,
-//			'user_registered' => date( 'Y-m-d H:i:s' ),
-//			'role'            => $user_role,
-//		));
-//		if ( ! is_wp_error( $new_user_id ) && is_int( $new_user_id ) ) {
-
-
-		$invite_register_page = buddyforms_get_form_field_by_slug( $_POST['form_slug'], 'collaborative-publishing' );
-
-		$activation_link = '<a href="' . get_permalink( $invite_register_page['invite_register_page'] ) . '?user_email=' . $new_user_email . '">Register now!</a>';
-
-//			$code            = sha1( $new_user_id . time() );
-//
-//			$activation_link = add_query_arg( array(
-//				'key'       => $code,
-//				'user'      => $new_user_id,
-//				'source'    => 'invitation',
-//				'_wpnonce'  => buddyforms_create_nonce( 'buddyform_activate_user_link', $user_id )
-//			), $activation_page );
-
-
-		// Now let us send the mail
-		$subject = __( 'You got an invite to register and edit' );
-
-		$mail_to = $new_user_email;
-
-		$emailBody = $_POST['user_invite_email_message'];
-
-		$emailBody .= ' ' . $activation_link;
-
-//	$post       = get_post( $post_id );
-//	$post_title = $post->post_title;
-//	$postperma  = get_permalink( $post->ID );
-
-
-		$from_email = get_option( 'admin_email' );
-
-
-		$mailheaders = "MIME-Version: 1.0\n";
-		$mailheaders .= "X-Priority: 1\n";
-		$mailheaders .= "Content-Type: text/html; charset=\"UTF-8\"\n";
-		$mailheaders .= "Content-Transfer-Encoding: 7bit\n\n";
-		$mailheaders .= "From: " . $from_email . "<" . $from_email . ">" . "\r\n";
-
-		$message = '<html><head></head><body>' . $emailBody . '</body></html>';
-
-		$result = wp_mail( $mail_to, $subject, $message, $mailheaders );
-//		}
-
-	}
-
-
-//	if ( ! $result ) {
-//		echo __( 'There has been an error sending the message!', 'buddyforms-collaborative-publishing');
-//	}
-
-	$json['old_user_emails']     = $old_user_emails;
-	$json['new_user_email_html'] = $new_user_email_html;
-	echo json_encode( $json );
-
-	die();
-}
-
-
-add_action( 'wp_ajax_bf_load_users', 'buddyforms_ajax_load_users' );
-add_action( 'wp_ajax_nopriv_bf_load_users', 'buddyforms_ajax_load_users' );
-function buddyforms_ajax_load_users() {
-	if ( ! ( is_array( $_POST ) && defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-		return;
-	}
-
-	if ( ! isset( $_POST['action'] ) || wp_verify_nonce( $_POST['nonce'], 'bf_user_loading' ) === false ) {
-		wp_die();
-	}
-
-	$args = array(//	'search_columns' => array( 'user_login', 'user_email' )
-	);
-
-//	$form_slug = '';
-//	if ( empty( $_POST['form_slug'] ) ) {
-//		wp_send_json_error( new WP_Error( 'invalid_form_slug', 'Invalid Form Slug' ), 500 );
-//	} else {
-//		$form_slug = sanitize_title( $_POST['form_slug'] );
-//	}
-
-	if ( ! empty( $_POST['search'] ) ) {
-		$args['search'] = $_POST['search']; // sanitize_title_for_query( $_POST['search'] );
-	}
-
-	$user_result = false;
-
-	if ( empty( $user_result ) ) {
-		$user_result = new WP_User_Query( $args );
-	}
-
-	if ( is_wp_error( $user_result ) ) {
-		wp_send_json_error( $user_result, 500 );
-	} else {
-		$response = new stdClass;
-		$result   = array();
-
-		if ( ! empty( $user_result->get_results() ) ) {
-			foreach ( $user_result->get_results() as $user ) {
-				$current       = new stdClass;
-				$current->id   = $user->ID;
-				$current->text = $user->display_name;
-				$result[]      = $current;
-			}
-		} else {
-			if ( is_email( $_POST['search'] ) ) {
-				$current       = new stdClass;
-				$current->id   = 'new-' . $_POST['search'];
-				$current->text = $_POST['search'];
-				$result[]      = $current;
-			}
-		}
-
-		$response->results = $result;
-		wp_send_json( $response );
-	}
-}

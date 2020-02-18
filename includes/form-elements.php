@@ -16,7 +16,9 @@ function buddyforms_cpublishing_elements_to_select( $elements_select_options ) {
 	$elements_select_options['cpublishing']['label']                              = __( 'Collaborative Publishing', 'buddyforms-collaborative-publishing' );
 	$elements_select_options['cpublishing']['class']                              = 'bf_show_if_f_type_post';
 	$elements_select_options['cpublishing']['fields']['collaborative-publishing'] = array(
-		'label' => __( 'Collaborative Publishing', 'buddyforms' ),
+		'label'  => __( 'Collaborative Publishing', 'buddyforms-collaborative-publishing' ),
+		'is_pro' => true,
+		'unique' => 'unique'
 	);
 
 	return $elements_select_options;
@@ -49,8 +51,8 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				$roles_array[ $role_kay ] = $role['name'];
 			}
 
-			$name                           = isset( $custom_field['name'] ) ? stripcslashes( $custom_field['name'] ) : __( 'Collaborative Publishing', 'buddyforms' );
-			$form_fields['general']['name'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][name]", array(
+			$name                           = isset( $custom_field['name'] ) ? stripcslashes( $custom_field['name'] ) : __( 'Collaborative Publishing', 'buddyforms-collaborative-publishing' );
+			$form_fields['general']['name'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][name]", array(
 				'value'    => $name,
 				'data'     => $field_id,
 				'class'    => "use_as_slug",
@@ -61,15 +63,15 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors'] ) ) {
 				$cpublishing_editors = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors'];
 			}
-			$form_fields['general']['cpublishing_editors'] = new Element_Select( '<b>' . __( 'Editors', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_editors]", $roles_array, array(
+			$form_fields['general']['cpublishing_editors'] = new Element_Select( '<b>' . __( 'Editors', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_editors]", $roles_array, array(
 				'value'         => $cpublishing_editors,
 				'data-field_id' => $field_id,
 				'shortDesc'     => 'You can enable all users or filter the select for a specific user role'
 			) );
 //			$multiple_editors                                    = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_editors'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_editors'] : 'false';
-//			$form_fields['general']['multiple_editors']          = new Element_Checkbox( '<b>' . __( 'Multiple Editors', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_editors]", array( 'multiple_editors' => '<b>' . __( 'Multiple Editors', 'buddyforms' ) . '</b>' ), array( 'value' => $multiple_editors ) );
-			$cpublishing_editors_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors_label'] ) : __( 'Select Editors', 'buddyforms' );
-			$form_fields['general']['cpublishing_editors_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_editors_label]", array(
+//			$form_fields['general']['multiple_editors']          = new Element_Checkbox( '<b>' . __( 'Multiple Editors', 'buddyforms-collaborative-publishing') . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_editors]", array( 'multiple_editors' => '<b>' . __( 'Multiple Editors', 'buddyforms-collaborative-publishing') . '</b>' ), array( 'value' => $multiple_editors ) );
+			$cpublishing_editors_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_editors_label'] ) : __( 'Select Editors', 'buddyforms-collaborative-publishing' );
+			$form_fields['general']['cpublishing_editors_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_editors_label]", array(
 				'data'      => $field_id,
 				'value'     => $cpublishing_editors_label,
 				'shortDesc' => 'Allow one or multiple editors'
@@ -77,7 +79,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 
 
 //			$enable_moderation                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_moderation'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_moderation'] : 'false';
-//			$form_fields['general']['enable_moderation'] = new Element_Checkbox( '<b>' . __( 'Enable Moderation', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_moderation]", array( 'enable_moderation' => '<b>' . __( 'Enable Moderation', 'buddyforms' ) . '</b>' ),
+//			$form_fields['general']['enable_moderation'] = new Element_Checkbox( '<b>' . __( 'Enable Moderation', 'buddyforms-collaborative-publishing') . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_moderation]", array( 'enable_moderation' => '<b>' . __( 'Enable Moderation', 'buddyforms-collaborative-publishing') . '</b>' ),
 //				array(
 //					'value'              => $enable_moderation,
 //					'data'               => $field_id,
@@ -94,20 +96,20 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 //			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators'] ) ) {
 //				$cpublishing_moderators = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators'];
 //			}
-//			$form_fields['general']['cpublishing_moderators']       = new Element_Select( '<b>' . __( 'Select Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_moderators]", $roles_array, array(
+//			$form_fields['general']['cpublishing_moderators']       = new Element_Select( '<b>' . __( 'Select Moderators', 'buddyforms-collaborative-publishing') . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_moderators]", $roles_array, array(
 //				'value'         => $cpublishing_moderators,
 //				'data-field_id' => $field_id,
 //				'class'         => $bf_hide_if_not_multiple_moderators,
 //				'shortDesc'     => 'You can enable all users or filter the select for a specific user role'
 //			) );
 //			$multiple_moderators                                    = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_moderators'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['multiple_moderators'] : 'false';
-//			$form_fields['general']['multiple_moderators']          = new Element_Checkbox( '<b>' . __( 'Multiple Moderators', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_moderators]", array( 'multiple_moderators' => '<b>' . __( 'Multiple moderators', 'buddyforms' ) . '</b>' ), array(
+//			$form_fields['general']['multiple_moderators']          = new Element_Checkbox( '<b>' . __( 'Multiple Moderators', 'buddyforms-collaborative-publishing') . '</b>', "buddyforms_options[form_fields][" . $field_id . "][multiple_moderators]", array( 'multiple_moderators' => '<b>' . __( 'Multiple moderators', 'buddyforms-collaborative-publishing') . '</b>' ), array(
 //				'value'     => $multiple_moderators,
 //				'class'     => $bf_hide_if_not_multiple_moderators,
 //				'shortDesc' => 'Allow one or multiple moderators.'
 //			) );
-//			$cpublishing_moderators_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) : __( 'Select Moderators', 'buddyforms' );
-//			$form_fields['general']['cpublishing_moderators_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_moderators_label]", array(
+//			$cpublishing_moderators_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_moderators_label'] ) : __( 'Select Moderators', 'buddyforms-collaborative-publishing');
+//			$form_fields['general']['cpublishing_moderators_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms-collaborative-publishing') . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_moderators_label]", array(
 //				'data'  => $field_id,
 //				'value' => $cpublishing_moderators_label,
 //				'class' => $bf_hide_if_not_multiple_moderators
@@ -115,7 +117,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 
 
 			$enable_teams                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] : 'false';
-			$form_fields['general']['enable_teams'] = new Element_Checkbox( '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_teams]", array( 'enable_teams' => '<b>' . __( 'Enable Teams', 'buddyforms' ) . '</b>' ),
+			$form_fields['general']['enable_teams'] = new Element_Checkbox( '<b>' . __( 'Enable Teams', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_teams]", array( 'enable_teams' => '<b>' . __( 'Enable Teams', 'buddyforms-collaborative-publishing' ) . '</b>' ),
 				array(
 					'value'              => $enable_teams,
 					'data'               => $field_id,
@@ -132,15 +134,15 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'] ) ) {
 				$cpublishing_teams = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'];
 			}
-			$form_fields['general']['cpublishing_teams'] = new Element_Select( '<b>' . __( 'Select a Team Base', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_teams]", buddyforms_cpublishing_get_team_forms(), array(
+			$form_fields['general']['cpublishing_teams'] = new Element_Select( '<b>' . __( 'Select a Team Base', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_teams]", buddyforms_cpublishing_get_team_forms(), array(
 				'value'         => $cpublishing_teams,
 				'data-field_id' => $field_id,
 				'class'         => $bf_hide_if_not_enable_teams,
 				'shortDesc'     => 'Select a form to use the form post type'
 			) );
 
-			$cpublishing_team_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) : __( 'Select a Team', 'buddyforms' );
-			$form_fields['general']['cpublishing_team_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_team_label]", array(
+			$cpublishing_team_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) : __( 'Select a Team', 'buddyforms-collaborative-publishing' );
+			$form_fields['general']['cpublishing_team_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_team_label]", array(
 				'data'  => $field_id,
 				'value' => $cpublishing_team_label,
 				'class' => $bf_hide_if_not_enable_teams,
@@ -148,7 +150,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 
 
 			$invite_by_mail                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_by_mail'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_by_mail'] : 'false';
-			$form_fields['general']['invite_by_mail'] = new Element_Checkbox( '<b>' . __( 'Invite by Mail', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_by_mail]", array( 'invite_by_mail' => '<b>' . __( 'Invite by Mail', 'buddyforms' ) . '</b>' ),
+			$form_fields['general']['invite_by_mail'] = new Element_Checkbox( '<b>' . __( 'Invite by Mail', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_by_mail]", array( 'invite_by_mail' => '<b>' . __( 'Invite by Mail', 'buddyforms-collaborative-publishing' ) . '</b>' ),
 				array(
 					'value'              => $invite_by_mail,
 					'data'               => $field_id,
@@ -169,28 +171,28 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 
 			// After Submission Page
 			$invite_register_page                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_register_page'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_register_page'] : 'false';
-			$form_fields['general']['invite_register_page'] = new Element_Select( '<b>' . __( "Invite Register Page", 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_register_page]", $all_pages, array(
+			$form_fields['general']['invite_register_page'] = new Element_Select( '<b>' . __( "Invite Register Page", 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_register_page]", $all_pages, array(
 				'value'     => $invite_register_page,
-				'shortDesc' => __( 'Select the Page from where the content gets displayed. Will redirected to the page if ajax is disabled, otherwise display the content.', 'buddyforms' ),
+				'shortDesc' => __( 'Select the Page from where the content gets displayed. Will redirected to the page if ajax is disabled, otherwise display the content.', 'buddyforms-collaborative-publishing' ),
 				'class'     => $bf_hide_if_not_invite_by_mail,
 			) );
 
 
-			$invite_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_message'] ) : __( 'You got an invite to edit a post', 'buddyforms' );
-			$form_fields['general']['invite_message'] = new Element_Textarea( '<b>' . __( 'Message Text', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_message]", array(
+			$invite_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_message'] ) : __( 'You got an invite to edit a post', 'buddyforms-collaborative-publishing' );
+			$form_fields['general']['invite_message'] = new Element_Textarea( '<b>' . __( 'Message Text', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][invite_message]", array(
 				'data'  => $field_id,
 				'value' => $invite_message,
 				'class' => $bf_hide_if_not_invite_by_mail,
 			) );
 
-			$delete_request_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) : __( 'We share a post I like to delete. Please follow the link to approve the delete request.', 'buddyforms' );
-			$form_fields['general']['delete_request_message'] = new Element_Textarea( '<b>' . __( 'Delete Request Message Text', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][delete_request_message]", array(
+			$delete_request_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) : __( 'We share a post I like to delete. Please follow the link to approve the delete request.', 'buddyforms-collaborative-publishing' );
+			$form_fields['general']['delete_request_message'] = new Element_Textarea( '<b>' . __( 'Delete Request Message Text', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][delete_request_message]", array(
 				'data'  => $field_id,
 				'value' => $delete_request_message,
 			) );
 
-//			$edit_request_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['edit_request_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['edit_request_message'] ) : __( 'I like to edit this post', 'buddyforms' );
-//			$form_fields['general']['edit_request_message'] = new Element_Textbox( '<b>' . __( 'Edit Request Message Text', 'buddyforms' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][edit_request_message]", array(
+//			$edit_request_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['edit_request_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['edit_request_message'] ) : __( 'I like to edit this post', 'buddyforms-collaborative-publishing');
+//			$form_fields['general']['edit_request_message'] = new Element_Textbox( '<b>' . __( 'Edit Request Message Text', 'buddyforms-collaborative-publishing') . '</b>', "buddyforms_options[form_fields][" . $field_id . "][edit_request_message]", array(
 //				'data'  => $field_id,
 //				'value' => $edit_request_message,
 //			) );
@@ -254,12 +256,12 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 				$blogusers = get_users();
 			} else {
 				$blogusers = get_users( array(
-					'role' => $customfield['cpublishing_editors']
+					'role__in' => array( $customfield['cpublishing_editors'] )
 				) );
 			}
 			// Array of WP_User objects.
 			if ( ! ( isset( $customfield['multiple_editors'] ) && is_array( $customfield['multiple_editors'] ) ) ) {
-				$options['none'] = __( 'Select an Editor' );
+				$options['none'] = __( 'Select an Editor', 'buddyforms-collaborative-publishing' );
 			}
 			foreach ( $blogusers as $user ) {
 				$options[ $user->ID ] = $user->user_nicename;
@@ -269,8 +271,8 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 				$element_attr['data-reset'] = 'true';
 			}
 
-			$label = __( 'Select Editors', 'buddyforms' );
-			if ( isset ( $customfield['cpublishing_editors_label'] ) ) {
+			$label = __( 'Select Editors', 'buddyforms-collaborative-publishing' );
+			if ( ! empty ( $customfield['cpublishing_editors_label'] ) ) {
 				$label = $customfield['cpublishing_editors_label'];
 			}
 
@@ -278,6 +280,12 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 			$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_editors', true );
 			$element_attr['id']    = 'col-lab-editors';
 
+			$labels_layout = isset( $buddyforms[ $form_slug ]['layout']['labels_layout'] ) ? $buddyforms[ $form_slug ]['layout']['labels_layout'] : 'inline';
+
+			if ( $labels_layout == 'inline' && isset( $customfield['required'] ) ) {
+				$required                         = $form->getRequiredPlainSignal();
+				$element_attr['data-placeholder'] = $label . $required;
+			}
 
 			$element = new Element_Select( $label, 'buddyforms_editors', $options, $element_attr );
 
@@ -292,7 +300,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 //			if ( isset( $customfield['enable_moderation'] ) ) {
 //
-//				$label = __( 'Select Moderators', 'buddyforms' );
+//				$label = __( 'Select Moderators', 'buddyforms-collaborative-publishing' );
 //				if ( isset ( $customfield['cpublishing_moderators_label'] ) ) {
 //					$label = $customfield['cpublishing_moderators_label'];
 //				}
@@ -314,8 +322,8 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 //			}
 
 			if ( isset( $customfield['enable_teams'] ) ) {
-				$label = __( 'Select a Team', 'buddyforms' );
-				if ( isset ( $customfield['cpublishing_team_label'] ) ) {
+				$label = __( 'Select a Team', 'buddyforms-collaborative-publishing' );
+				if ( ! empty ( $customfield['cpublishing_team_label'] ) ) {
 					$label = $customfield['cpublishing_team_label'];
 				}
 
@@ -323,7 +331,7 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 				$element_attr['value'] = get_post_meta( $post_id, 'buddyforms_teams', true );
 				$element_attr['id']    = $customfield['slug'] . '-teams';
 
-				$team_forms['none'] = __( 'Select a Team' );
+				$team_forms['none'] = __( 'Select a Team', 'buddyforms-collaborative-publishing' );
 				if ( isset( $customfield['cpublishing_teams'] ) ) {
 
 					$args      = array(
@@ -341,8 +349,12 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 
 				}
 
-				$element = new Element_Select( $label, 'buddyforms_teams', $team_forms, $element_attr );
+				if ( $labels_layout == 'inline' && isset( $customfield['required'] ) ) {
+					$required           = $form->renderRequired();
+					$team_forms['none'] = $label . $required;
+				}
 
+				$element = new Element_Select( $label, 'buddyforms_teams', $team_forms, $element_attr );
 
 				BuddyFormsAssets::load_select2_assets();
 
@@ -366,90 +378,3 @@ function buddyforms_cpublishing_frontend_form_elements( $form, $form_args ) {
 }
 
 add_filter( 'buddyforms_create_edit_form_display_element', 'buddyforms_cpublishing_frontend_form_elements', 1, 2 );
-
-/**
- * Save Fields
- *
- * @param array $custom_field
- * @param $post_id
- */
-function buddyforms_cpublishing_update_post_meta( $custom_field, $post_id ) {
-	if ( $custom_field['type'] == 'collaborative-publishing' ) {
-
-		// Create a editors array to store all editors.
-		$editors     = array();
-		$old_editors = get_post_meta( $post_id, 'buddyforms_editors', true );
-		$old_team    = get_post_meta( $post_id, 'buddyforms_teams', true );
-
-		// Update the editors post meta
-		if ( ! empty( $_POST['buddyforms_editors'] ) ) {
-			update_post_meta( $post_id, 'buddyforms_editors', $_POST['buddyforms_editors'] );
-
-			// Update the editors array
-			foreach ( $_POST['buddyforms_editors'] as $key => $editor ) {
-				$editors[ $editor ] = $editor;
-			}
-		}
-
-		//
-		// Update the teams and add all team members to the editors array
-		//
-		if ( ! empty( $_POST['buddyforms_teams'] ) ) {
-
-			// Update the team post meta
-			update_post_meta( $post_id, 'buddyforms_teams', $_POST['buddyforms_teams'] );
-
-
-			// Make sure the team is not the same post
-			if ( $_POST['buddyforms_teams'] != $post_id ) {
-
-				// Get all editors form the team post
-				$team_editors = get_post_meta( $_POST['buddyforms_teams'], 'buddyforms_editors', true );
-
-				//Add all team editors to the editors array
-				foreach ( $team_editors as $tkey => $teditor ) {
-					$editors[ $teditor ] = $teditor;
-				}
-			}
-		}
-
-		// Add all editors to the buddyforms_editors taxonomy
-		$term_editors = wp_set_post_terms( $post_id, $editors, 'buddyforms_editors', false );
-
-		// Loop through the old editors and remove them from the buddyforms_user_posts taxonomy
-		if ( ! empty( $old_editors ) ) {
-			foreach ( $old_editors as $post_editor ) {
-				if ( ! array_key_exists( $post_editor, $editors ) ) {
-					wp_remove_object_terms( $post_editor, strval( $post_id ), 'buddyforms_user_posts' );
-				}
-			}
-		}
-
-		// Check if the team has changed and if so remove the old team members from the buddyforms_user_posts taxonomy
-		if ( ! empty( $old_team ) ) {
-			if ( $old_team != $_POST['buddyforms_teams'] ) {
-
-				// Gert the old team members
-				$old_team_editors = get_post_meta( $_POST['buddyforms_teams'], 'buddyforms_editors', true );
-
-				// Remove the post_id from the old team members
-				foreach ( $old_team_editors as $old_post_editor ) {
-					wp_remove_object_terms( $old_post_editor, strval( $post_id ), 'buddyforms_user_posts' );
-				}
-			}
-		}
-
-		// Loop thru all editors and add the post to the buddyforms_user_posts taxonomy
-		foreach ( $editors as $editor_id ) {
-			$user_posts = wp_set_object_terms( $editor_id, strval( $post_id ), 'buddyforms_user_posts', true );
-		}
-
-		// Update the Moderators post meta
-//		if ( ! empty( $_POST['buddyforms_moderators'] ) ) {
-//			$moderators = update_post_meta( $post_id, 'buddyforms_moderators', $_POST['buddyforms_moderators'] );
-//		}
-
-	}
-}
-
-add_action( 'buddyforms_update_post_meta', 'buddyforms_cpublishing_update_post_meta', 10, 2 );

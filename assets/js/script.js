@@ -6,7 +6,8 @@ var buddyformsCollaborativePublishingInstance = {
 		var regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		return regex.test(email.trim());
 	},
-	bfInviteNewEditors: function () {
+	bfInviteNewEditors: function (event) {
+		event.preventDefault();
 		var currentPopup = jQuery('#TB_ajaxContent');
 		if (currentPopup && currentPopup.length === 0) {
 			console.log('something went wrong, tickbox is not present, please contact the admin');
@@ -42,38 +43,48 @@ var buddyformsCollaborativePublishingInstance = {
 			data: {
 				"action": "buddyforms_invite_new_user_as_editor",
 				"post_id": post_id,
+				"nonce": buddyformsCollaborativePublishingObj.nonce,
 				"form_slug": form_slug,
 				"user_invite_email_select": user_invite_email_select,
 				"user_invite_email_message": bf_invite_mail_message
 			},
 			success: function (data) {
-				console.log(data);
-				if (data['new_user_email_html']) {
-					jQuery('#buddyforms_panding_invites_list').html(data['new_user_email_html']);
-				}
-				var selected = jQuery('#col-lab-editors').select2('data');
-				if (data['old_user_emails'].length > 0) {
-					jQuery.each(data['old_user_emails'], function (index, element) {
-						console.log(index + ' - ' + element);
-						var data2 = {
-							id: index,
-							text: element
-						};
-						// Set the value, creating a new option if necessary
-						if (jQuery('#col-lab-editors').find("option[value='" + data2.id + "']").length) {
-							selected.push(data2.id);
-						} else {
-							// Create a DOM Option and pre-select by default
-							var newOption = new Option(data2.text, data2.id, true, true);
-							// Append it to the select
-							jQuery('#col-lab-editors').append(newOption).trigger('change');
+				if (data) {
+					if (data['new_user_email_html']) {
+						jQuery('#buddyforms_pending_invites_list').html(data['new_user_email_html']);
+					}
+					var coLabEditorSelect = jQuery('#col-lab-editors');
+					if (coLabEditorSelect && coLabEditorSelect.length > 0) {
+						var selected = coLabEditorSelect.select2('data');
+						var newSelected = [];
+						if (data['old_user_emails']) {
+							if(selected.length > 0){
+								jQuery.each(selected, function (index, element) {
+									newSelected.push(element.id);
+								});
+							}
+							jQuery.each(data['old_user_emails'], function (index, element) {
+								var data2 = {
+									id: index,
+									text: element
+								};
+								// Set the value, creating a new option if necessary
+								if (coLabEditorSelect.find("option[value='" + data2.id + "']").length) {
+									newSelected.push(data2.id);
+								} else {
+									// Create a DOM Option and pre-select by default
+									var newOption = new Option(data2.text, data2.id, true, true);
+									// Append it to the select
+									coLabEditorSelect.append(newOption).trigger('change');
+								}
+							});
+							coLabEditorSelect.val(newSelected).trigger('change');
 						}
-					});
-					jQuery('#col-lab-editors').val(selected).trigger('change');
+					}
 				}
-				// jQuery('#buddyforms_invite_wrap').html('<p>Invite send successfully</p>');
 				tb_remove();
 				btnInviteEditor.text(actionButtonOriginalText);
+				btnInviteEditor.removeAttr('disabled');
 			},
 			error: function (request, status, error) {
 				btnInviteEditor.text(actionButtonOriginalText);
@@ -90,7 +101,8 @@ var buddyformsCollaborativePublishingInstance = {
 			url: buddyformsCollaborativePublishingObj.ajax,
 			data: {
 				"action": "buddyforms_ask_to_become_an_editor",
-				"post_id": post_id
+				"post_id": post_id,
+				"nonce": buddyformsCollaborativePublishingObj.nonce,
 			},
 			success: function (data) {
 				if (isNaN(data)) {
@@ -117,7 +129,8 @@ var buddyformsCollaborativePublishingInstance = {
 				url: buddyformsCollaborativePublishingObj.ajax,
 				data: {
 					"action": "buddyforms_ajax_delete_post",
-					"post_id": post_id
+					"post_id": post_id,
+					"nonce": buddyformsCollaborativePublishingObj.nonce,
 				},
 				success: function (data) {
 					if (isNaN(data)) {
@@ -147,7 +160,8 @@ var buddyformsCollaborativePublishingInstance = {
 				url: buddyformsCollaborativePublishingObj.ajax,
 				data: {
 					"action": "buddyforms_ajax_delete_post",
-					"post_id": post_id
+					"post_id": post_id,
+					"nonce": buddyformsCollaborativePublishingObj.nonce,
 				},
 				success: function (data) {
 					if (isNaN(data)) {
@@ -168,8 +182,18 @@ var buddyformsCollaborativePublishingInstance = {
 		}
 		return false;
 	},
+	bfFieldName: function (fieldName, [formSlug, fieldId, form]) {
+		var validNames = ['buddyforms_editors', 'collaborative-publishing', 'buddyforms_teams', 'user_invite_email_select'];
+		if (fieldName && formSlug && buddyformsGlobal && buddyformsGlobal[formSlug] && buddyformsGlobal[formSlug].form_fields) {
+			if (validNames.includes(fieldName)) {
+				return 'Collaborative Publishing';
+			}
+		}
+
+		return fieldName;
+	},
 	init: function () {
-		if (buddyformsCollaborativePublishingObj) {
+		if (buddyformsCollaborativePublishingObj && buddyformsCollaborativePublishingObj.nonce && buddyformsCollaborativePublishingObj.ajax) {
 			jQuery(document.body).on('click', '.bf_cpublishing_delete_post', buddyformsCollaborativePublishingInstance.bfDeletePost);
 			jQuery(document.body).on('click', '.bf_remove_as_editor', buddyformsCollaborativePublishingInstance.bfRemoveAsEditor);
 			jQuery(document.body).on('click', '.bf_become_an_editor', buddyformsCollaborativePublishingInstance.bfBecomeAnEditor);
