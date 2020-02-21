@@ -146,10 +146,10 @@ function buddyforms_cpublishing_delete_post( $post_id, $current_user = '' ) {
 
 
 		// Remove the post from the user posts taxonomy
-		wp_remove_object_terms( $current_user, strval( $post_id ), 'buddyforms_user_posts', true );
+		wp_remove_object_terms( $current_user, strval( $post_id ), 'buddyforms_user_posts' );
 
 		// Remove the user from the post editors
-		wp_remove_object_terms( $post_id, strval( $current_user ), 'buddyforms_editors', true );
+		wp_remove_object_terms( $post_id, strval( $current_user ), 'buddyforms_editors' );
 
 
 	}
@@ -314,25 +314,45 @@ add_action( 'wp_ajax_nopriv_bf_collaborative_publishing_load_users', 'buddyforms
  *
  * @param int $post_id
  * @param array $posted_editors
- * @param $form_slug
+ * @param string $form_slug
  */
 function buddyforms_cpublishing_update_editors( $post_id, $posted_editors, $form_slug ) {
 	$editors           = array();
 	$editors_to_notify = array();
 	$old_editors       = get_post_meta( $post_id, 'buddyforms_editors', true );
-
+	$invited_users     = get_post_meta( $post_id, 'buddyforms_collaborative_invited', true );
+	if ( empty( $invited_users ) ) {
+		$invited_users = array();
+	}
 	if ( ! empty( $posted_editors ) ) {
 		// Update the editors array
 		foreach ( $posted_editors as $editor ) {
 			$editor             = intval( $editor );
 			$editors[ $editor ] = $editor;
-			$user_info = get_userdata( $editor );
+			$user_info          = get_userdata( $editor );
 			if ( ! empty( $user_info ) && ! is_wp_error( $user_info ) ) {
-				$editors_to_notify[ $user_info->ID ] = $user_info->user_email;
+				//not add to the notification queue if they already was notified
+				if ( ! in_array( $user_info->user_email, $invited_users ) ) {
+					$editors_to_notify[ $user_info->ID ] = $user_info->user_email;
+					$invited_users[ $user_info->ID ]     = $user_info->user_email;
+				}
 			}
 		}
 		// Update the editors post meta
 		update_post_meta( $post_id, 'buddyforms_editors', $editors );
+		//Remove old user from already notified list
+		if ( ! empty( $old_editors ) ) {
+			foreach ( $old_editors as $post_editor ) {
+				if ( ! array_key_exists( intval( $post_editor ), $editors ) && isset( $invited_users[ $post_editor ] ) ) {
+					unset( $invited_users[ $post_editor ] );
+				}
+			}
+		}
+
+		//Update the user already notified list
+		if ( ! empty( $invited_users ) ) {
+			update_post_meta( $post_id, 'buddyforms_collaborative_invited', $invited_users );
+		}
 
 		//Send notification to all the editors
 		$invite_message = __( 'You got an invite to edit a post', 'buddyforms-collaborative-publishing' );
@@ -411,7 +431,7 @@ function buddyforms_cpublishing_update_teams( $post_id, $posted_teams, $form_slu
 }
 
 /**
- * Save Fields
+ * Save Fields when the form is submitted
  *
  * @param array $custom_field
  * @param $post_id
@@ -419,8 +439,12 @@ function buddyforms_cpublishing_update_teams( $post_id, $posted_teams, $form_slu
  */
 function buddyforms_cpublishing_update_post_meta( $custom_field, $post_id, $form_slug ) {
 	if ( $custom_field['type'] == 'collaborative-publishing' ) {
-		buddyforms_cpublishing_update_editors( $post_id, $_POST['buddyforms_editors'], $form_slug );
-		buddyforms_cpublishing_update_teams( $post_id, $_POST['buddyforms_teams'], $form_slug );
+		if ( ! empty( $_POST['buddyforms_editors'] ) ) {
+			buddyforms_cpublishing_update_editors( $post_id, $_POST['buddyforms_editors'], $form_slug );
+		}
+		if ( ! empty( $_POST['buddyforms_teams'] ) ) {
+			buddyforms_cpublishing_update_teams( $post_id, $_POST['buddyforms_teams'], $form_slug );
+		}
 	}
 }
 
@@ -547,7 +571,12 @@ function buddyforms_cpublishing_invite_new_user_as_editor() {
 
 	$from_email = get_option( 'admin_email' );
 
-	$new_user_emails_saved = get_post_meta( $post_id, 'buddyforms_new_user_emails', true );
+	$new_user_emails_saved     = get_post_meta( $post_id, 'buddyforms_new_user_emails', true );
+	$invited_user_emails_saved = get_post_meta( $post_id, 'buddyforms_collaborative_invited', true );
+
+	if ( empty( $invited_user_emails_saved ) ) {
+		$invited_user_emails_saved = array();
+	}
 
 	$new_user_emails = array();
 	if ( ! empty( $new_user_emails_saved ) ) {
@@ -569,29 +598,31 @@ function buddyforms_cpublishing_invite_new_user_as_editor() {
 		}
 	}
 
-	buddyforms_cpublishing_message_existing_users( $existing_user_emails, $email_body, $from_email, $form_slug, $post_id );
+	$invited_users = array_merge( $new_user_emails, $existing_user_emails );
 
 	// Register new User
 	$new_user_email_html = '';
 	foreach ( $new_user_emails as $new_user_email ) {
-		$new_user_email_html .= sprintf( "<li>%s</li>", $new_user_email );
+		if ( ! in_array( $new_user_email, $invited_user_emails_saved ) ) {
+			$new_user_email_html .= sprintf( "<li>%s &nbsp;<span class='bf-collaborative-remove-email-invite-container'><a href='#' data-post='%s' data-target-email='%s' class='bf-collaborative-remove-email-invite'>%s</a></span></li>", esc_attr( $new_user_email ), intval( $post_id ), esc_attr( $new_user_email ), __( 'Remove', 'buddyforms-collaborative-publishing' ) );
 
-		$field_options = buddyforms_get_form_field_by( $form_slug, 'collaborative-publishing', 'type' );
-		if ( empty( $field_options['invite_register_page'] ) ) {
-			continue;
-		}
+			$field_options = buddyforms_get_form_field_by( $form_slug, 'collaborative-publishing', 'type' );
+			if ( empty( $field_options['invite_register_page'] ) ) {
+				continue;
+			}
 
-		$activation_link = sprintf( "<a href=\"%s?user_email=%s\">%s</a>", get_permalink( $field_options['invite_register_page'] ), $new_user_email, __( 'Register now!', 'buddyforms-collaborative-publishing' ) );
-		$subject         = apply_filters( 'buddyforms_collaborative_publishing_message_subject', __( 'You got an invite to register and edit', 'buddyforms-collaborative-publishing' ), $form_slug, $post_id, 'new' );
-		$mail_to         = $new_user_email;
-		$inner_body      = $email_body;
-		$inner_body      .= PHP_EOL . $activation_link;
+			$activation_link = sprintf( "<a href=\"%s?user_email=%s\">%s</a>", get_permalink( $field_options['invite_register_page'] ), $new_user_email, __( 'Register now!', 'buddyforms-collaborative-publishing' ) );
+			$subject         = apply_filters( 'buddyforms_collaborative_publishing_message_subject', __( 'You got an invite to register and edit', 'buddyforms-collaborative-publishing' ), $form_slug, $post_id, 'new' );
+			$mail_to         = $new_user_email;
+			$inner_body      = $email_body;
+			$inner_body      .= PHP_EOL . $activation_link;
 
-		$inner_body = nl2br( $inner_body );
-		$result     = buddyforms_email( $mail_to, $subject, $from_email, $from_email, $inner_body, array(), array(), $form_slug, $post_id );
+			$inner_body = nl2br( $inner_body );
+			$result     = buddyforms_email( $mail_to, $subject, $from_email, $from_email, $inner_body, array(), array(), $form_slug, $post_id );
 
-		if ( ! $result ) {
-			BuddyFormsCPublishing::error_log( sprintf( "Error Sending the new user email. Form: %s", $form_slug ) );
+			if ( ! $result ) {
+				BuddyFormsCPublishing::error_log( sprintf( "Error Sending the new user email. Form: %s", $form_slug ) );
+			}
 		}
 	}
 
@@ -601,6 +632,10 @@ function buddyforms_cpublishing_invite_new_user_as_editor() {
 
 	if ( ! empty( $existing_user_emails ) ) {
 		buddyforms_cpublishing_update_editors( $post_id, $existing_user_emails, $form_slug );
+	}
+
+	if ( ! empty( $invited_users ) ) {
+		update_post_meta( $post_id, 'buddyforms_collaborative_invited', $invited_users );
 	}
 
 	$json['old_user_emails'] = $existing_user_emails;
@@ -613,3 +648,50 @@ function buddyforms_cpublishing_invite_new_user_as_editor() {
 }
 
 add_action( 'wp_ajax_buddyforms_invite_new_user_as_editor', 'buddyforms_cpublishing_invite_new_user_as_editor' );
+
+function buddyforms_collaborative_remove_email_invitation() {
+	if ( ! ( is_array( $_POST ) && defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+		return;
+	}
+
+	if ( ! isset( $_POST['action'] ) || ! isset( $_POST['nonce'] ) || empty( $_POST['post_id'] ) || empty( $_POST['email'] ) ) {
+		die();
+	}
+
+	if ( ! wp_verify_nonce( $_POST['nonce'], BUDDYFORMS_CPUBLISHING_INSTALL_PATH . 'bf_collaborative_publishing' ) ) {
+		die();
+	}
+
+	$string_error = apply_filters( 'buddyforms_collaborative_publishing_invalid', __( 'There has been an error!', 'buddyforms-collaborative-publishing' ) );
+
+	if ( ! isset( $_POST['post_id'] ) ) {
+		echo $string_error;
+		die();
+	}
+
+	$post_id = intval( $_POST['post_id'] );
+	$email   = sanitize_email( $_POST['email'] );
+
+	$new_user_emails_saved     = get_post_meta( $post_id, 'buddyforms_new_user_emails', true );
+	$invited_user_emails_saved = get_post_meta( $post_id, 'buddyforms_collaborative_invited', true );
+
+	if ( ! empty( $new_user_emails_saved ) ) {
+		$find_in_email_saved = array_search( $email, $new_user_emails_saved );
+		if ( $find_in_email_saved !== false && isset( $new_user_emails_saved[ $find_in_email_saved ] ) ) {
+			unset( $new_user_emails_saved[ $find_in_email_saved ] );
+			update_post_meta( $post_id, 'buddyforms_new_user_emails', $new_user_emails_saved );
+		}
+	}
+	if ( ! empty( $invited_user_emails_saved ) ) {
+		$find_in_invited_email_saved = array_search( $email, $invited_user_emails_saved );
+		if ( $find_in_invited_email_saved !== false && isset( $invited_user_emails_saved[ $find_in_invited_email_saved ] ) ) {
+			unset( $invited_user_emails_saved[ $find_in_invited_email_saved ] );
+			update_post_meta( $post_id, 'buddyforms_collaborative_invited', $invited_user_emails_saved );
+		}
+	}
+
+	wp_send_json_success('true');
+	die();
+}
+
+add_action( 'wp_ajax_buddyforms_collaborative_remove_email_invitation', 'buddyforms_collaborative_remove_email_invitation' );

@@ -133,7 +133,43 @@ class BuddyFormsCPublishing {
 
 	public function need_buddyforms() {
 		?>
-		<div class="notice notice-error"><p>Need <strong>BuddyForms Professional</strong> activated. Minimum version <i>2.5.10</i> required.</p></div>
+		<style>
+			.buddyforms-notice label.buddyforms-title {
+				background: rgba(0, 0, 0, 0.3);
+				color: #fff;
+				padding: 2px 10px;
+				position: absolute;
+				top: 100%;
+				bottom: auto;
+				right: auto;
+				-moz-border-radius: 0 0 3px 3px;
+				-webkit-border-radius: 0 0 3px 3px;
+				border-radius: 0 0 3px 3px;
+				left: 10px;
+				font-size: 12px;
+				font-weight: bold;
+				cursor: auto;
+			}
+
+			.buddyforms-notice .buddyforms-notice-body {
+				margin: .5em 0;
+				padding: 2px;
+			}
+
+			.buddyforms-notice.buddyforms-title {
+				margin-bottom: 30px !important;
+			}
+
+			.buddyforms-notice {
+				position: relative;
+			}
+		</style>
+		<div class="error buddyforms-notice buddyforms-title">
+			<label class="buddyforms-title">BuddyForms Collaborative Publishing</label>
+			<div class="buddyforms-notice-body">
+				<b>Oops...</b> BuddyForms Collaborative Publishing cannot run without <a target="_blank" href="https://themekraft.com/buddyforms/">BuddyForms</a>.
+			</div>
+		</div>
 		<?php
 	}
 
@@ -201,7 +237,7 @@ class BuddyFormsCPublishing {
 		}
 		if ( BuddyFormsCPublishing::getNeedAssets() ) {
 			wp_enqueue_script( 'buddyforms-collaborative-script', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/js/script.js', array( 'jquery' ), self::getVersion() );
-			wp_enqueue_style( 'buddyforms-collaborative-style', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/css/style.css',  array(), self::getVersion() );
+			wp_enqueue_style( 'buddyforms-collaborative-style', BUDDYFORMS_CPUBLISHING_PLUGIN_URL . 'assets/css/style.css', array(), self::getVersion() );
 			wp_localize_script( 'buddyforms-collaborative-script', 'buddyformsCollaborativePublishingObj', array(
 				'ajax'     => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( BUDDYFORMS_CPUBLISHING_INSTALL_PATH . 'bf_collaborative_publishing' ),

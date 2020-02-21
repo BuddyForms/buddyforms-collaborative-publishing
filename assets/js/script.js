@@ -6,6 +6,38 @@ var buddyformsCollaborativePublishingInstance = {
 		var regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		return regex.test(email.trim());
 	},
+	bfRemoveEmailInvitation: function (event) {
+		event.preventDefault();
+		var element = jQuery(this);
+		var spanContainer = jQuery(this).parent();
+		var container = element.closest('li');
+		var targetEmail = element.attr('data-target-email');
+		var targetPost = element.attr('data-post');
+		if (targetEmail && targetPost) {
+			spanContainer.html('');
+			spanContainer.text('Loading...');
+			jQuery.ajax({
+			type: 'POST',
+			dataType: "json",
+			url: ajaxurl,
+			data: {
+				"action": "buddyforms_collaborative_remove_email_invitation",
+				"email": targetEmail,
+				"nonce": buddyformsCollaborativePublishingObj.nonce,
+				"post_id": targetPost,
+			},
+			success: function (data) {
+				if (data) {
+					container.hide('fast', function(){ container.remove(); });
+				}
+			},
+			error: function (request, status, error) {
+				console.log(request.responseText);
+				spanContainer.text('Error :(');
+			}
+		});
+		}
+	},
 	bfInviteNewEditors: function (event) {
 		event.preventDefault();
 		var currentPopup = jQuery('#TB_ajaxContent');
@@ -58,7 +90,7 @@ var buddyformsCollaborativePublishingInstance = {
 						var selected = coLabEditorSelect.select2('data');
 						var newSelected = [];
 						if (data['old_user_emails']) {
-							if(selected.length > 0){
+							if (selected.length > 0) {
 								jQuery.each(selected, function (index, element) {
 									newSelected.push(element.id);
 								});
@@ -198,6 +230,7 @@ var buddyformsCollaborativePublishingInstance = {
 			jQuery(document.body).on('click', '.bf_remove_as_editor', buddyformsCollaborativePublishingInstance.bfRemoveAsEditor);
 			jQuery(document.body).on('click', '.bf_become_an_editor', buddyformsCollaborativePublishingInstance.bfBecomeAnEditor);
 			jQuery(document.body).on('click', '#buddyforms_invite_new_user_as_editor', buddyformsCollaborativePublishingInstance.bfInviteNewEditors);
+			jQuery(document.body).on('click', '.bf-collaborative-remove-email-invite', buddyformsCollaborativePublishingInstance.bfRemoveEmailInvitation);
 		}
 	}
 };

@@ -68,3 +68,7 @@ div#TB_ajaxContent {
 		width: 90% !important;
 	}
 }
+
+.bf-collaborative-remove-email-invite-container{
+	color: red;
+}

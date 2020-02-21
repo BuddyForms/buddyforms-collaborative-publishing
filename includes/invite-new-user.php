@@ -18,7 +18,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 				<?php
 				if ( ! empty( $new_user_emails ) ) {
 					foreach ( $new_user_emails as $new_user_email ) {
-						echo sprintf( "<li>%s</li>", esc_attr( $new_user_email ) );
+						echo sprintf( "<li>%s&nbsp;<span class='bf-collaborative-remove-email-invite-container'><a href='#' data-post='%s' data-target-email='%s' class='bf-collaborative-remove-email-invite'>%s</a></span></li>", esc_attr( $new_user_email ), intval( $post_id ), esc_attr( $new_user_email ), __( 'Remove', 'buddyforms-collaborative-publishing' ) );
 					}
 				}
 				?>
@@ -30,10 +30,12 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 		<div id="buddyforms_invite_wrap">
 			<?php
 			//Load collaborative field needed options
+			$selected_roles = '';
 			$invite_message = __( 'You got an invite to edit a post', 'buddyforms-collaborative-publishing' );
 			$field_options  = buddyforms_get_form_field_by( $form_slug, 'collaborative-publishing', 'type' );
 			if ( ! empty( $field_options ) ) {
 				$invite_message = ! empty( $field_options['invite_message'] ) ? $field_options['invite_message'] : __( 'You got an invite to edit a post', 'buddyforms-collaborative-publishing' );
+				$selected_roles = ! empty( $field_options['cpublishing_editors'] ) ? $field_options['cpublishing_editors'] : '';
 			}
 
 			// Create the form object
@@ -64,9 +66,10 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 				'tab_index'     => 0,
 				'hide_if_empty' => false,
 				'allowClear'    => true,
+				'role__in'      => $selected_roles
 			);
 
-			$placeholder = __( 'Type to search', 'buddyforms-collaborative-publishing' );
+			$placeholder = __( 'Search', 'buddyforms-collaborative-publishing' );
 
 			$args = array_merge( $args, Array(
 				'multiple'          => 'multiple',
@@ -135,6 +138,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 										        jQuery(this).data("placeholder");
 										    },
                                      allowClear: true,
+                                     dropdownCssClass: "buddyforms-dropdown",
 							        tokenSeparators: [\',\']
 							    });
 						    });
