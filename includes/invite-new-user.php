@@ -1,7 +1,4 @@
 <?php
-
-//add_action( 'buddyforms_post_edit_meta_box_select_form', 'buddyforms_cbublishing_invite_new_editor' );
-
 function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 	global $post, $buddyforms;
 	$description     = '';

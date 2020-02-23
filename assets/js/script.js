@@ -17,25 +17,27 @@ var buddyformsCollaborativePublishingInstance = {
 			spanContainer.html('');
 			spanContainer.text('Loading...');
 			jQuery.ajax({
-			type: 'POST',
-			dataType: "json",
-			url: ajaxurl,
-			data: {
-				"action": "buddyforms_collaborative_remove_email_invitation",
-				"email": targetEmail,
-				"nonce": buddyformsCollaborativePublishingObj.nonce,
-				"post_id": targetPost,
-			},
-			success: function (data) {
-				if (data) {
-					container.hide('fast', function(){ container.remove(); });
+				type: 'POST',
+				dataType: "json",
+				url: ajaxurl,
+				data: {
+					"action": "buddyforms_collaborative_remove_email_invitation",
+					"email": targetEmail,
+					"nonce": buddyformsCollaborativePublishingObj.nonce,
+					"post_id": targetPost,
+				},
+				success: function (data) {
+					if (data) {
+						container.hide('fast', function () {
+							container.remove();
+						});
+					}
+				},
+				error: function (request, status, error) {
+					console.log(request.responseText);
+					spanContainer.text('Error :(');
 				}
-			},
-			error: function (request, status, error) {
-				console.log(request.responseText);
-				spanContainer.text('Error :(');
-			}
-		});
+			});
 		}
 	},
 	bfInviteNewEditors: function (event) {
@@ -50,7 +52,6 @@ var buddyformsCollaborativePublishingInstance = {
 		var bf_invite_mail_message = currentPopup.find('#user_invite_email_message').val();
 		var invalidSelectedUserStr = buddyformsCollaborativePublishingObj.language.invalid_invite_editors || 'You need to select a valid user or type a valid email.';
 		var invalidMessageStr = buddyformsCollaborativePublishingObj.language.invalid_invite_message || 'Message is a required field.';
-		var popupLoading = buddyformsCollaborativePublishingObj.language.popup_loading || 'Loading...';
 		if (!user_invite_email_select) {
 			alert(invalidSelectedUserStr);
 			return false;
@@ -66,6 +67,7 @@ var buddyformsCollaborativePublishingInstance = {
 
 		btnInviteEditor.attr('disabled', true);
 		var actionButtonOriginalText = btnInviteEditor.text();
+		var popupLoading = buddyformsCollaborativePublishingObj.language.popup_loading || 'Loading...';
 		btnInviteEditor.text(popupLoading);
 
 		jQuery.ajax({
@@ -125,8 +127,10 @@ var buddyformsCollaborativePublishingInstance = {
 			}
 		});
 	},
+	//TODO pending to review if needed
 	bfBecomeAnEditor: function () {
 		var post_id = jQuery(this).attr('id');
+		var form_slug = jQuery(this).attr("data-form_slug");
 		var editRequestInProcessStr = buddyformsCollaborativePublishingObj.language.edit_request_in_process || 'Edit Request in Process.';
 		jQuery.ajax({
 			type: 'POST',
@@ -134,6 +138,7 @@ var buddyformsCollaborativePublishingInstance = {
 			data: {
 				"action": "buddyforms_ask_to_become_an_editor",
 				"post_id": post_id,
+				"form_slug": form_slug,
 				"nonce": buddyformsCollaborativePublishingObj.nonce,
 			},
 			success: function (data) {
@@ -152,34 +157,51 @@ var buddyformsCollaborativePublishingInstance = {
 		});
 		return false;
 	},
-	bfRemoveAsEditor: function () {
-		var post_id = jQuery(this).attr('id');
+	bfRemoveAsEditor: function (event) {
+		event.preventDefault();
+		var element = jQuery(this);
+		if (element.hasClass('clicked')) {
+			console.log('already clicked');
+			return false;
+		}
 		var removeEditorStr = buddyformsCollaborativePublishingObj.language.remove_as_editor || 'Are you sure to remove as Editor?';
 		if (confirm(removeEditorStr)) {
+			element.addClass('clicked');
+			var actionOriginalText = element.html();
+			var popupLoading = buddyformsCollaborativePublishingObj.language.popup_loading || 'Loading...';
+			element.text(popupLoading);
+			var form_slug = element.attr("data-form_slug");
+			var post_id = element.attr('id');
 			jQuery.ajax({
 				type: 'POST',
+				dataType: "json",
 				url: buddyformsCollaborativePublishingObj.ajax,
 				data: {
-					"action": "buddyforms_ajax_delete_post",
+					"action": "buddyforms_remove_as_editor",
 					"post_id": post_id,
 					"nonce": buddyformsCollaborativePublishingObj.nonce,
+					"form_slug": form_slug,
 				},
 				success: function (data) {
-					if (isNaN(data)) {
-						alert(data);
-					} else {
-						var id = "#bf_post_li_";
-						var li = id + data;
-						li = li.replace(/\s+/g, '');
-						jQuery(li).remove();
+					if (data && data.data && data.data.form_slug && data.data.post_id) {
+						alert('Remove as editor successfully!');
+						var postContainer = jQuery('.bf_posts_' + data.data.post_id);
+						if (postContainer && postContainer.length > 0) {
+							postContainer.hide('fast', function () {
+								postContainer.remove();
+							});
+						}
 					}
 				},
-				error: function (request) {
+				error: function (request, status, error) {
 					alert(request.responseText);
+				},
+				complete: function () {
+					tb_remove();
+					element.html(actionOriginalText);
+					element.removeClass('clicked');
 				}
 			});
-		} else {
-			return false;
 		}
 		return false;
 	},

@@ -1,78 +1,26 @@
 <?php
 
+/**
+ * Delete post action with the popup
+ *
+ * @param $post_id
+ * @param $form_slug
+ *
+ * @return string
+ */
 function buddyforms_cbublishing_delete_post( $post_id, $form_slug ) {
-	global $post, $buddyforms;
-	add_thickbox();
-
+	ob_start();
 	?>
+	<?php echo sprintf( "<a data-form_slug=\"%s\" id=\"buddyforms_delete\" href=\"#TB_inline?width=800&height=600&inlineId=buddyforms_delete_modal_%s\" title=\"%s\" class=\"thickbox\"><span aria-label=\"%s\" title=\"%s\" class=\"dashicons dashicons-trash\"> </span> %s</a>", $form_slug, $post_id, __( 'Delete Post', 'buddyforms' ), __( 'Delete Post', 'buddyforms' ), __( 'Delete Post', 'buddyforms' ), __( 'Delete Post', 'buddyforms' ) ); ?>
 
-    <script>
-        jQuery(document).ready(function () {
-            jQuery(document).on("click", '#buddyforms_delete_post_as_editor_<?php echo $post_id ?>', function (evt) {
-
-                var post_delete_email_subject = jQuery('#post_delete_email_subject_<?php echo $post_id ?>').val();
-                var post_delete_email_message = jQuery('#post_delete_email_message_<?php echo $post_id ?>').val();
-
-                if (post_delete_email_subject == '') {
-                    alert('Mail Subject is a required field');
-                    return false;
-                }
-                if (post_delete_email_message == '') {
-                    alert('Message is a required field');
-                    return false;
-                }
-
-                var post_id = jQuery(this).attr("data-post_id");
-                var form_slug = jQuery(this).attr("data-form_slug");
-
-                jQuery.ajax({
-                    type: 'POST',
-                    dataType: "json",
-                    url: ajaxurl,
-                    data: {
-                        "action": "buddyforms_delete_post_as_editor",
-                        "post_id": post_id,
-                        "form_slug": form_slug,
-                        "post_delete_email_subject": post_delete_email_subject,
-                        "post_delete_email_message": post_delete_email_message
-                    },
-                    success: function (data) {
-
-                        console.log(data);
-
-                        alert('Delete Request has been send successfully!');
-                        tb_remove();
-
-                    },
-                    error: function (request, status, error) {
-                        alert(request.responseText);
-                    }
-                });
-
-            });
-        });
-    </script>
-    <style>
-        #buddyforms_delete_wrap input[type="text"] {
-            width: 100%;
-        }
-
-        div#TB_ajaxContent {
-            width: 96% !important;
-            height: 96% !important;
-        }
-    </style>
-
-	<?php echo '<a id="buddyforms_delete" href="#TB_inline?width=800&height=600&inlineId=buddyforms_delete_modal_' .  $post_id . '" title="' . __( 'Delete Post', 'buddyforms' ) . '" class="thickbox"><span aria-label="' . __( 'Delete Post', 'buddyforms' ) . '" title="' . __( 'Delete Post', 'buddyforms' ) . '" class="dashicons dashicons-trash"> </span> ' . __( 'Delete Post', 'buddyforms' ) . '</a>'; ?>
-
-    <div id="buddyforms_delete_modal_<?php echo $post_id ?>" style="display:none;">
-        <div id="buddyforms_delete_wrap">
-            <br><br>
+	<div id="buddyforms_delete_modal_<?php echo $post_id ?>" style="display:none;">
+		<div id="buddyforms_delete_wrap">
+			<br><br>
 
 			<?php
-
+			global $buddyforms;
 			// Create the form object
-            $form_id = "buddyforms_delete_post_" . $post_id;
+			$form_id = "buddyforms_delete_post_" . $post_id;
 
 			$delete_form = new Form( $form_id );
 
@@ -85,31 +33,24 @@ function buddyforms_cbublishing_delete_post( $post_id, $form_slug ) {
 			$delete_form->addElement( new Element_Textbox( 'Subject', 'post_delete_email_subject_' . $post_id, array( 'value' => 'Delete Post Request' ) ) );
 
 			$delete_request_message = '';
-			if ( isset( $buddyforms[$form_slug]['form_fields'] ) ) {
-				foreach ( $buddyforms[$form_slug]['form_fields'] as $key => $form_field ) {
+			if ( isset( $buddyforms[ $form_slug ]['form_fields'] ) ) {
+				foreach ( $buddyforms[ $form_slug ]['form_fields'] as $key => $form_field ) {
 					if ( $form_field['type'] == 'collaborative-publishing' ) {
 						$delete_request_message = $form_field['delete_request_message'];
 					}
 				}
 			}
 
-			$delete_form->addElement( new Element_Textarea( 'Add a Message', 'post_delete_email_message_' . $post_id , array( 'value' => $delete_request_message, 'class' => 'collaburative-publishiing-message' ) ) );
-
-
+			$delete_form->addElement( new Element_Textarea( 'Add a Message', 'post_delete_email_message_' . $post_id, array( 'value' => $delete_request_message, 'class' => 'collaburative-publishiing-message' ) ) );
 			$delete_form->render();
-
 			?>
-
-            <br>
-            <a id="buddyforms_delete_post_as_editor_<?php echo $post_id ?>"
-               data-post_id="<?php echo $post_id ?>"
-               data-form_slug="<?php echo $form_slug ?>"
-               href="#" class="button">Sent Delete Request</a>
-        </div>
-    </div>
-
+			<button id="buddyforms_delete_post_as_editor" data-post_id="<?php echo esc_attr( $post_id ) ?>" data-form_slug="<?php echo esc_attr( $form_slug ) ?>" href="#" class="button"><?php echo __( 'Sent Delete Request', 'buddyforms-collaborative-publishing' ) ?></button>
+		</div>
+	</div>
 	<?php
+	$content = ob_get_clean();
 
+	return $content;
 }
 
 add_action( 'wp_ajax_buddyforms_delete_post_as_editor', 'buddyforms_delete_post_as_editor' );
@@ -136,13 +77,13 @@ function buddyforms_delete_post_as_editor() {
 
 
 	$post_editors_array = array();
-	foreach ($post_editors as $editor){
-		$post_editors_array[$editor->slug] = $editor->slug;
-    }
+	foreach ( $post_editors as $editor ) {
+		$post_editors_array[ $editor->slug ] = $editor->slug;
+	}
 
 	$author_id = get_post_field( 'post_author', $post_id );
 
-	$post_editors_array[$author_id] = $author_id;
+	$post_editors_array[ $author_id ] = $author_id;
 
 	foreach ( $post_editors_array as $post_editor ) {
 
@@ -217,7 +158,7 @@ add_action( 'init', 'buddyforms_delete_post_request' );
 
 function buddyforms_delete_post_request() {
 
-	if ( isset($_GET['bf_delete_post_request']) ) {
+	if ( isset( $_GET['bf_delete_post_request'] ) ) {
 
 		$key     = $_GET['key'];
 		$post_id = $_GET['bf_delete_post_request'];
@@ -226,30 +167,27 @@ function buddyforms_delete_post_request() {
 
 
 		if ( ! wp_verify_nonce( $nonce, 'buddyform_delete_post_editor_keys' ) ) {
-		//	return false;
+			//	return false;
 		}
 
 
 		$buddyform_delete_post_editor = get_user_meta( $user_id, 'buddyform_delete_post_editor_key_' . $post_id, true );
 
 
-		if ( isset( $buddyform_delete_post_editor) ) {
+		if ( isset( $buddyform_delete_post_editor ) ) {
 			if ( $key == $buddyform_delete_post_editor ) {
 				// Delete editor from meta and taxonomies
 				buddyforms_cpublishing_delete_post( $post_id, $user_id );
 
-
 				$post_editors = wp_get_post_terms( $post_id, 'buddyforms_editors' );
 
-				$post_count = count($post_editors);
-				if($post_count == 0){
+				$post_count = count( $post_editors );
+				if ( $post_count == 0 ) {
 					do_action( 'buddyforms_delete_post', $post_id );
 					wp_delete_post( $post_id );
-                }
-
+				}
 			}
 		}
-
 
 
 		// if only author is left and the author also has approved teh delete, the post should get deleted
@@ -263,22 +201,22 @@ function buddyforms_delete_post_request() {
 function buddyforms_delete_post_request_success() {
 
 	?>
-    <script>
-        jQuery(document).ready(function () {
-            alert('Delete Done');
-            document.location.href = "/";
-        });
-    </script>
+	<script>
+		jQuery(document).ready(function () {
+			alert('Delete Done');
+			document.location.href = "/";
+		});
+	</script>
 	<?php
 }
 
 function buddyforms_delete_post_request_error() {
 
 	?>
-    <script>
-        jQuery(document).ready(function () {
-            alert('Delete Error');
-        });
-    </script>
+	<script>
+		jQuery(document).ready(function () {
+			alert('Delete Error');
+		});
+	</script>
 	<?php
 }

@@ -161,33 +161,27 @@ function buddyforms_cpublishing_delete_post( $post_id, $current_user = '' ) {
 add_action( 'buddyforms_delete_post', 'buddyforms_cpublishing_delete_post', 10, 1 );
 
 
-add_action( 'buddyforms_the_loop_actions_last', 'buddyforms_cpublishing_the_loop_actions' );
+/**
+ * Add the extra action button to remove as editor, become an editor and remove the post
+ *
+ * @param $post_id
+ */
 function buddyforms_cpublishing_the_loop_actions( $post_id ) {
-
 	$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
 	$form_slug  = get_post_meta( $post_id, '_bf_form_slug', true );
 
 	if ( in_array( $post_id, $user_posts ) ) {
-		echo '<li>';
-		echo '<a title="' . __( 'Remove as Editor', 'buddyforms' ) . '"  id="' . $post_id . '" class="bf_remove_as_editor" href="#"><span aria-label="' . __( 'Remove as Editor', 'buddyforms' ) . '" title="' . __( 'Remove as Editor', 'buddyforms' ) . '" class="dashicons dashicons-trash"> </span> ' . __( 'Remove as Editor', 'buddyforms' ) . '</a></li>';
-		echo '</li>';
-		echo '<li>';
-		//echo '<a title="' . __( 'Delete Post', 'buddyforms' ) . '"  id="' . $post_id . '" class="bf_cpublishing_delete_post" href="#"><span aria-label="' . __( 'Delete Post', 'buddyforms' ) . '" title="' . __( 'Delete Post', 'buddyforms' ) . '" class="dashicons dashicons-trash"> </span> ' . __( 'Delete Post', 'buddyforms' ) . '</a></li>';
-		buddyforms_cbublishing_delete_post( $post_id, $form_slug );
-		echo '</li>';
-
-
+		echo sprintf( "<li><a data-form_slug=\"%s\" title=\"%s\"  id=\"%s\" class=\"bf_remove_as_editor\" href=\"#\"><span aria-label=\"%s\" title=\"%s\" class=\"dashicons dashicons-trash\"> </span> %s</a></li>", $form_slug, __( 'Remove as Editor', 'buddyforms' ), $post_id, __( 'Remove as Editor', 'buddyforms' ), __( 'Remove as Editor', 'buddyforms' ), __( 'Remove as Editor', 'buddyforms' ) );
+		echo sprintf( "<li>%s</li>", buddyforms_cbublishing_delete_post( $post_id, $form_slug ) );
 	} else {
 		$author_id = get_post_field( 'post_author', $post_id );
 		if ( get_current_user_id() != $author_id ) {
-			echo '<li>';
-			echo '<a title="' . __( 'Become an Editor', 'buddyforms' ) . '"  id="' . $post_id . '" class="bf_become_an_editor" href="#"><span aria-label="' . __( 'Become an Editor', 'buddyforms' ) . '" title="' . __( 'Become an Editor', 'buddyforms' ) . '" class="dashicons dashicons-trash"> </span> ' . __( 'Become an Editor', 'buddyforms' ) . '</a></li>';
-			echo '</li>';
+			echo sprintf( "<li><a data-form_slug=\"%s\" title=\"%s\"  id=\"%s\" class=\"bf_become_an_editor\" href=\"#\"><span aria-label=\"%s\" title=\"%s\" class=\"dashicons dashicons-trash\"> </span> %s</a></li>", $form_slug, __( 'Become an Editor', 'buddyforms' ), $post_id, __( 'Become an Editor', 'buddyforms' ), __( 'Become an Editor', 'buddyforms' ), __( 'Become an Editor', 'buddyforms' ) );
 		}
-
 	}
-
 }
+
+add_action( 'buddyforms_the_loop_actions_last', 'buddyforms_cpublishing_the_loop_actions' );
 
 /**
  * Include the pods field into JS options
@@ -373,7 +367,10 @@ function buddyforms_cpublishing_update_editors( $post_id, $posted_editors, $form
 	if ( ! empty( $old_editors ) ) {
 		foreach ( $old_editors as $post_editor ) {
 			if ( ! array_key_exists( intval( $post_editor ), $editors ) ) {
-				wp_remove_object_terms( $post_editor, strval( $post_id ), 'buddyforms_user_posts' );
+				$exist_term = term_exists( $post_editor, strval( $post_id ), 'buddyforms_user_posts' );
+				if ( ! empty( $exist_term ) ) {
+					wp_remove_object_terms( $exist_term['term_id'], strval( $post_id ), 'buddyforms_user_posts' );
+				}
 			}
 		}
 	}
@@ -649,6 +646,68 @@ function buddyforms_cpublishing_invite_new_user_as_editor() {
 
 add_action( 'wp_ajax_buddyforms_invite_new_user_as_editor', 'buddyforms_cpublishing_invite_new_user_as_editor' );
 
+/**
+ * Ajax action executed when an user ask to be removed as editor
+ */
+function buddyforms_cpublishing_remove_as_editor() {
+	if ( ! ( is_array( $_POST ) && defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+		return;
+	}
+
+	if ( ! isset( $_POST['action'] ) || ! isset( $_POST['nonce'] ) || empty( $_POST['form_slug'] ) || empty( $_POST['post_id'] ) ) {
+		die();
+	}
+
+	if ( ! wp_verify_nonce( $_POST['nonce'], BUDDYFORMS_CPUBLISHING_INSTALL_PATH . 'bf_collaborative_publishing' ) ) {
+		die();
+	}
+
+	global $buddyforms;
+
+	$string_error = apply_filters( 'buddyforms_collaborative_publishing_invalid', __( 'There has been an error sending the message!', 'buddyforms-collaborative-publishing' ) );
+
+	if ( ! isset( $_POST['post_id'] ) ) {
+		echo $string_error;
+		die();
+	}
+
+	$form_slug       = sanitize_title( $_POST['form_slug'] );
+	$post_id         = intval( $_POST['post_id'] );
+	$current_user_id = get_current_user_id();
+	$user_info       = get_userdata( $current_user_id );
+	if ( empty( $user_info ) || is_wp_error( $user_info ) ) {
+		die();
+	}
+
+	//Remove from the taxonomy
+	$exist_term = term_exists( strval( $post_id ), 'buddyforms_user_posts' );
+	if ( ! empty( $exist_term ) ) {
+		$r = wp_remove_object_terms( $current_user_id, strval( $post_id ), 'buddyforms_user_posts' );
+	}
+	//Remove from the post meta and the list of invited emails.
+	$editors_saved = get_post_meta( $post_id, 'buddyforms_editors', true );
+	if ( ! empty( $editors_saved ) ) {
+		if ( isset( $editors_saved[ $current_user_id ] ) ) {
+			unset( $editors_saved[ $current_user_id ] );
+			update_post_meta( $post_id, 'buddyforms_editors', $editors_saved );
+		}
+		//Remove from the list of invited emails
+		$invited_user_emails_saved = get_post_meta( $post_id, 'buddyforms_collaborative_invited', true );
+		if ( ! empty( $invited_user_emails_saved ) ) {
+			$find_user_emails_saved = array_search( $user_info->user_email, $invited_user_emails_saved );
+			if ( $find_user_emails_saved !== false && isset( $invited_user_emails_saved[ $find_user_emails_saved ] ) ) {
+				unset( $invited_user_emails_saved[ $find_user_emails_saved ] );
+				update_post_meta( $post_id, 'buddyforms_collaborative_invited', $invited_user_emails_saved );
+			}
+		}
+	}
+
+	wp_send_json_success( array( 'form_slug' => $form_slug, 'post_id' => $post_id ) );
+	die();
+}
+
+add_action( 'wp_ajax_buddyforms_remove_as_editor', 'buddyforms_cpublishing_remove_as_editor' );
+
 function buddyforms_collaborative_remove_email_invitation() {
 	if ( ! ( is_array( $_POST ) && defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
 		return;
@@ -690,8 +749,36 @@ function buddyforms_collaborative_remove_email_invitation() {
 		}
 	}
 
-	wp_send_json_success('true');
+	wp_send_json_success( 'true' );
 	die();
 }
 
 add_action( 'wp_ajax_buddyforms_collaborative_remove_email_invitation', 'buddyforms_collaborative_remove_email_invitation' );
+
+function buddyforms_collaborative_let_user_edit_invited_posts( $the_lp_query ) {
+	if ( ! empty( $the_lp_query ) && ! empty( $the_lp_query->query_vars['form_slug'] ) ) {
+		$form_slug     = $the_lp_query->query_vars['form_slug'];
+		$field_options = buddyforms_get_form_field_by( $form_slug, 'collaborative-publishing', 'type' );
+		if ( ! empty( $field_options ) ) {
+			$user_posts = wp_get_object_terms( get_current_user_id(), 'buddyforms_user_posts', array( 'fields' => 'slugs' ) );
+			if ( ! empty( $user_posts ) ) {
+				$invited_post_query = new WP_Query( array( 'post__in' => $user_posts, 'post_status' => 'any', 'post_type' => 'any' ) );
+				if ( ! empty( $invited_post_query ) && ! empty( $invited_post_query->posts ) ) {
+					if ( empty( $the_lp_query->posts ) ) {
+						$the_lp_query->posts       = $invited_post_query->posts;
+						$the_lp_query->post_count  = $invited_post_query->post_count;
+						$the_lp_query->found_posts = $invited_post_query->found_posts;
+					} else {
+						$the_lp_query->post_count  = $the_lp_query->post_count + $invited_post_query->post_count;
+						$the_lp_query->found_posts = $the_lp_query->found_posts + $invited_post_query->found_posts;
+						$the_lp_query->posts       = array_merge( $the_lp_query->posts, $invited_post_query->posts );
+					}
+				}
+			}
+		}
+	}
+
+	return $the_lp_query;
+}
+
+add_filter( 'buddyforms_the_lp_query', 'buddyforms_collaborative_let_user_edit_invited_posts' );
