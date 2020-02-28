@@ -1,19 +1,18 @@
 <?php
 
+/**
+ * Taxonomy used to related the post with the user
+ */
 function buddyforms_cpublishing_register_user_posts_taxonomy() {
 	global $buddyforms;
 
-	/**
-	 * Taxonomy: User Posts.
-	 */
-
 	$labels = array(
-		"name"          => __( "User Posts", "buddyforms" ),
-		"singular_name" => __( "User Post", "buddyforms" ),
+		"name"          => __( "User Posts", "buddyforms-collaborative-publishing" ),
+		"singular_name" => __( "User Post", "buddyforms-collaborative-publishing" ),
 	);
 
 	$args = array(
-		"label"                 => __( "User Posts", "buddyforms" ),
+		"label"                 => __( "User Posts", "buddyforms-collaborative-publishing" ),
 		"labels"                => $labels,
 		"public"                => false,
 		"publicly_queryable"    => false,

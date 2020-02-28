@@ -116,37 +116,37 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 //			) );
 
 
-			$enable_teams                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] : 'false';
-			$form_fields['general']['enable_teams'] = new Element_Checkbox( '<b>' . __( 'Enable Teams', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_teams]", array( 'enable_teams' => '<b>' . __( 'Enable Teams', 'buddyforms-collaborative-publishing' ) . '</b>' ),
-				array(
-					'value'              => $enable_teams,
-					'data'               => $field_id,
-					'class'              => 'bf_enable_teams_hidden_checkbox',
-					'bf_hidden_checkbox' => 'bf_hide_if_not_enable_teams '
-				) );
-
-			$bf_hide_if_not_enable_teams = 'bf_hide_if_not_enable_teams';
-			if ( $enable_teams == 'false' ) {
-				$bf_hide_if_not_enable_teams = 'bf_hide_if_not_enable_teams hidden';
-			}
-
-			$cpublishing_teams = 'false';
-			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'] ) ) {
-				$cpublishing_teams = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'];
-			}
-			$form_fields['general']['cpublishing_teams'] = new Element_Select( '<b>' . __( 'Select a Team Base', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_teams]", buddyforms_cpublishing_get_team_forms(), array(
-				'value'         => $cpublishing_teams,
-				'data-field_id' => $field_id,
-				'class'         => $bf_hide_if_not_enable_teams,
-				'shortDesc'     => 'Select a form to use the form post type'
-			) );
-
-			$cpublishing_team_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) : __( 'Select a Team', 'buddyforms-collaborative-publishing' );
-			$form_fields['general']['cpublishing_team_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_team_label]", array(
-				'data'  => $field_id,
-				'value' => $cpublishing_team_label,
-				'class' => $bf_hide_if_not_enable_teams,
-			) );
+//			$enable_teams                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['enable_teams'] : 'false';
+//			$form_fields['general']['enable_teams'] = new Element_Checkbox( '<b>' . __( 'Enable Teams', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][enable_teams]", array( 'enable_teams' => '<b>' . __( 'Enable Teams', 'buddyforms-collaborative-publishing' ) . '</b>' ),
+//				array(
+//					'value'              => $enable_teams,
+//					'data'               => $field_id,
+//					'class'              => 'bf_enable_teams_hidden_checkbox',
+//					'bf_hidden_checkbox' => 'bf_hide_if_not_enable_teams '
+//				) );
+//
+//			$bf_hide_if_not_enable_teams = 'bf_hide_if_not_enable_teams';
+//			if ( $enable_teams == 'false' ) {
+//				$bf_hide_if_not_enable_teams = 'bf_hide_if_not_enable_teams hidden';
+//			}
+//
+//			$cpublishing_teams = 'false';
+//			if ( isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'] ) ) {
+//				$cpublishing_teams = $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_teams'];
+//			}
+//			$form_fields['general']['cpublishing_teams'] = new Element_Select( '<b>' . __( 'Select a Team Base', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_teams]", buddyforms_cpublishing_get_team_forms(), array(
+//				'value'         => $cpublishing_teams,
+//				'data-field_id' => $field_id,
+//				'class'         => $bf_hide_if_not_enable_teams,
+//				'shortDesc'     => 'Select a form to use the form post type'
+//			) );
+//
+//			$cpublishing_team_label                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['cpublishing_team_label'] ) : __( 'Select a Team', 'buddyforms-collaborative-publishing' );
+//			$form_fields['general']['cpublishing_team_label'] = new Element_Textbox( '<b>' . __( 'Label', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][cpublishing_team_label]", array(
+//				'data'  => $field_id,
+//				'value' => $cpublishing_team_label,
+//				'class' => $bf_hide_if_not_enable_teams,
+//			) );
 
 
 			$invite_by_mail                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_by_mail'] ) ? $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['invite_by_mail'] : 'false';
@@ -185,7 +185,7 @@ function buddyforms_cpublishing_form_builder_form_elements( $form_fields, $form_
 				'class' => $bf_hide_if_not_invite_by_mail,
 			) );
 
-			$delete_request_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) : __( 'We share a post I like to delete. Please follow the link to approve the delete request.', 'buddyforms-collaborative-publishing' );
+			$delete_request_message                           = isset( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) ? stripcslashes( $buddyforms[ $form_slug ]['form_fields'][ $field_id ]['delete_request_message'] ) : __( 'We share a post I like to delete. Please follow the links to take further action.', 'buddyforms-collaborative-publishing' );
 			$form_fields['general']['delete_request_message'] = new Element_Textarea( '<b>' . __( 'Delete Request Message Text', 'buddyforms-collaborative-publishing' ) . '</b>', "buddyforms_options[form_fields][" . $field_id . "][delete_request_message]", array(
 				'data'  => $field_id,
 				'value' => $delete_request_message,

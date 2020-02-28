@@ -40,6 +40,13 @@ class BuddyFormsCPublishing {
 	public static $slug = 'buddyforms-collaborative-publishing';
 
 	/**
+	 * Instance of this class
+	 *
+	 * @var $instance BuddyFormsFrontendTable
+	 */
+	protected static $instance = null;
+
+	/**
 	 * Initiate the class
 	 *
 	 * @package buddyforms CPUBLISHING
@@ -132,45 +139,7 @@ class BuddyFormsCPublishing {
 	}
 
 	public function need_buddyforms() {
-		?>
-		<style>
-			.buddyforms-notice label.buddyforms-title {
-				background: rgba(0, 0, 0, 0.3);
-				color: #fff;
-				padding: 2px 10px;
-				position: absolute;
-				top: 100%;
-				bottom: auto;
-				right: auto;
-				-moz-border-radius: 0 0 3px 3px;
-				-webkit-border-radius: 0 0 3px 3px;
-				border-radius: 0 0 3px 3px;
-				left: 10px;
-				font-size: 12px;
-				font-weight: bold;
-				cursor: auto;
-			}
-
-			.buddyforms-notice .buddyforms-notice-body {
-				margin: .5em 0;
-				padding: 2px;
-			}
-
-			.buddyforms-notice.buddyforms-title {
-				margin-bottom: 30px !important;
-			}
-
-			.buddyforms-notice {
-				position: relative;
-			}
-		</style>
-		<div class="error buddyforms-notice buddyforms-title">
-			<label class="buddyforms-title">BuddyForms Collaborative Publishing</label>
-			<div class="buddyforms-notice-body">
-				<b>Oops...</b> BuddyForms Collaborative Publishing cannot run without <a target="_blank" href="https://themekraft.com/buddyforms/">BuddyForms</a>.
-			</div>
-		</div>
-		<?php
+		self::admin_notice();
 	}
 
 	public static function error_log( $message ) {
@@ -242,18 +211,179 @@ class BuddyFormsCPublishing {
 				'ajax'     => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( BUDDYFORMS_CPUBLISHING_INSTALL_PATH . 'bf_collaborative_publishing' ),
 				'language' => apply_filters( 'bf_collaborative_publishing_language', array(
-					'edit_request_in_process' => apply_filters( 'bf_collaborative_publishing_edit_request_process_string', __( 'Edit Request in Process.', 'buddyforms-collaborative-publishing' ) ),
-					'remove_as_editor'        => apply_filters( 'bf_collaborative_publishing_remove_as_editor_string', __( 'Are you sure to remove as Editor', 'buddyforms-collaborative-publishing' ) ),
-					'remove_post'             => apply_filters( 'bf_collaborative_publishing_remove_post_string', __( 'Are you sure to delete the Post?', 'buddyforms-collaborative-publishing' ) ),
-					'invalid_invite_editors'  => apply_filters( 'bf_collaborative_publishing_invalid_invite_editors_string', __( 'You need to select a valid user or type a valid email.', 'buddyforms-collaborative-publishing' ) ),
-					'invalid_invite_message'  => apply_filters( 'bf_collaborative_publishing_invalid_invite_message_string', __( 'Message is a required field.', 'buddyforms-collaborative-publishing' ) ),
-					'popup_loading'           => apply_filters( 'bf_collaborative_publishing_modal_loading_string', __( 'Loading...', 'buddyforms-collaborative-publishing' ) ),
+					'edit_request_in_process'        => apply_filters( 'bf_collaborative_publishing_edit_request_process_string', __( 'Edit Request in Process.', 'buddyforms-collaborative-publishing' ) ),
+					'remove_as_editor'               => apply_filters( 'bf_collaborative_publishing_remove_as_editor_string', __( 'Are you sure to remove as Editor', 'buddyforms-collaborative-publishing' ) ),
+					'remove_post'                    => apply_filters( 'bf_collaborative_publishing_remove_post_string', __( 'Are you sure to delete the Post?', 'buddyforms-collaborative-publishing' ) ),
+					'invalid_invite_editors'         => apply_filters( 'bf_collaborative_publishing_invalid_invite_editors_string', __( 'You need to select a valid user or type a valid email.', 'buddyforms-collaborative-publishing' ) ),
+					'invalid_invite_message'         => apply_filters( 'bf_collaborative_publishing_invalid_invite_message_string', __( 'Message is a required field.', 'buddyforms-collaborative-publishing' ) ),
+					'invalid_remove_request_subject' => apply_filters( 'bf_collaborative_publishing_invalid_remove_request_subject_string', __( 'Subject is a required field.', 'buddyforms-collaborative-publishing' ) ),
+					'invalid_remove_request_message' => apply_filters( 'bf_collaborative_publishing_invalid_remove_request_message_string', __( 'Message is a required field.', 'buddyforms-collaborative-publishing' ) ),
+					'remove_request_successfully'    => apply_filters( 'bf_collaborative_publishing_remove_request_successfully_string', __( 'Delete Request has been send successfully.', 'buddyforms-collaborative-publishing' ) ),
+					'popup_loading'                  => apply_filters( 'bf_collaborative_publishing_modal_loading_string', __( 'Loading...', 'buddyforms-collaborative-publishing' ) ),
 				) )
 			) );
 			add_thickbox();
 		}
 	}
 
+	/**
+	 * Return an instance of this class.
+	 *
+	 * @return object A single instance of this class.
+	 */
+	public static function get_instance() {
+		// If the single instance hasn't been set, set it now.
+		if ( null == self::$instance ) {
+			self::$instance = new self;
+		}
+
+		return self::$instance;
+	}
+
+	public static function admin_notice( $html = '' ) {
+		if ( empty( $html ) ) {
+			$html = '<b>Oops...</b> BuddyForms Collaborative Publishing cannot run without <a target="_blank" href="https://themekraft.com/buddyforms/">BuddyForms</a>.';
+		}
+		?>
+		<style>
+			.buddyforms-notice label.buddyforms-title {
+				background: rgba(0, 0, 0, 0.3);
+				color: #fff;
+				padding: 2px 10px;
+				position: absolute;
+				top: 100%;
+				bottom: auto;
+				right: auto;
+				-moz-border-radius: 0 0 3px 3px;
+				-webkit-border-radius: 0 0 3px 3px;
+				border-radius: 0 0 3px 3px;
+				left: 10px;
+				font-size: 12px;
+				font-weight: bold;
+				cursor: auto;
+			}
+
+			.buddyforms-notice .buddyforms-notice-body {
+				margin: .5em 0;
+				padding: 2px;
+			}
+
+			.buddyforms-notice.buddyforms-title {
+				margin-bottom: 30px !important;
+			}
+
+			.buddyforms-notice {
+				position: relative;
+			}
+		</style>
+		<div class="error buddyforms-notice buddyforms-title">
+			<label class="buddyforms-title">BuddyForms Collaborative Publishing</label>
+			<div class="buddyforms-notice-body">
+				<?php echo $html; ?>
+			</div>
+		</div>
+		<?php
+	}
+
 }
 
-$GLOBALS['BuddyFormsCPublishing'] = new BuddyFormsCPublishing();
+function buddyforms_collaborative_publishing_freemius() {
+	global $buddyforms_collaborative_publishing_freemius;
+
+	if ( ! isset( $buddyforms_collaborative_publishing_freemius ) ) {
+		// Include Freemius SDK.
+		if ( file_exists( dirname( dirname( __FILE__ ) ) . '/buddyforms/includes/resources/freemius/start.php' ) ) {
+			// Try to load SDK from parent plugin folder.
+			require_once dirname( dirname( __FILE__ ) ) . '/buddyforms/includes/resources/freemius/start.php';
+		} elseif ( file_exists( dirname( dirname( __FILE__ ) ) . '/buddyforms-premium/includes/resources/freemius/start.php' ) ) {
+			// Try to load SDK from premium parent plugin folder.
+			require_once dirname( dirname( __FILE__ ) ) . '/buddyforms-premium/includes/resources/freemius/start.php';
+		}
+
+		try {
+			$buddyforms_collaborative_publishing_freemius = fs_dynamic_init( array(
+				'id'               => '5630',
+				'slug'             => 'buddyforms-collaborative-publishing',
+				'type'             => 'plugin',
+				'public_key'       => 'pk_7d36ea7c2b556511abb5c199bd2be',
+				'is_premium'       => true,
+				'is_premium_only'  => true,
+				'has_paid_plans'   => true,
+				'is_org_compliant' => false,
+				'trial'            => array(
+					'days'               => 14,
+					'is_require_payment' => true,
+				),
+				'parent'           => array(
+					'id'         => '391',
+					'slug'       => 'buddyforms',
+					'public_key' => 'pk_dea3d8c1c831caf06cfea10c7114c',
+					'name'       => 'BuddyForms',
+				),
+				'menu'             => array(
+					'first-path' => 'plugins.php',
+					'support'    => false,
+				),
+			) );
+		} catch ( Freemius_Exception $e ) {
+			return false;
+		}
+	}
+
+	return $buddyforms_collaborative_publishing_freemius;
+}
+
+function buddyforms_collaborative_publishing_freemius_is_parent_active_and_loaded() {
+	// Check if the parent's init SDK method exists.
+	return function_exists( 'buddyforms_core_fs' );
+}
+
+function buddyforms_collaborative_publishing_freemius_is_parent_active() {
+	$active_plugins = get_option( 'active_plugins', array() );
+
+	if ( is_multisite() ) {
+		$network_active_plugins = get_site_option( 'active_sitewide_plugins', array() );
+		$active_plugins         = array_merge( $active_plugins, array_keys( $network_active_plugins ) );
+	}
+
+	foreach ( $active_plugins as $basename ) {
+		if ( 0 === strpos( $basename, 'buddyforms/' ) ||
+		     0 === strpos( $basename, 'buddyforms-premium/' )
+		) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function buddyforms_collaborative_publishing_need_buddyforms() {
+	BuddyFormsCPublishing::admin_notice();
+}
+
+function buddyforms_collaborative_publishing_freemius_init() {
+	if ( buddyforms_collaborative_publishing_freemius_is_parent_active_and_loaded() ) {
+		// Init Freemius.
+		buddyforms_collaborative_publishing_freemius();
+
+		// Signal that the add-on's SDK was initiated.
+		do_action( 'buddyforms_collaborative_publishing_freemius_loaded' );
+
+		// Parent is active, add your init code here.
+		$GLOBALS['BuddyFormsCPublishing'] = BuddyFormsCPublishing::get_instance();
+	} else {
+		// Parent is inactive, add your error handling here.
+		add_action( 'admin_notices', 'buddyforms_collaborative_publishing_need_buddyforms' );
+	}
+}
+
+if ( buddyforms_collaborative_publishing_freemius_is_parent_active_and_loaded() ) {
+	// If parent already included, init add-on.
+	buddyforms_collaborative_publishing_freemius_init();
+} else if ( buddyforms_collaborative_publishing_freemius_is_parent_active() ) {
+	// Init add-on only after the parent is loaded.
+	add_action( 'buddyforms_core_fs_loaded', 'buddyforms_collaborative_publishing_freemius_init' );
+} else {
+	// Even though the parent is not activated, execute add-on for activation / uninstall hooks.
+	buddyforms_collaborative_publishing_freemius_init();
+}

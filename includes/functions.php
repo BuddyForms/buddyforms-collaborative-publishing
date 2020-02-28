@@ -782,3 +782,209 @@ function buddyforms_collaborative_let_user_edit_invited_posts( $the_lp_query ) {
 }
 
 add_filter( 'buddyforms_the_lp_query', 'buddyforms_collaborative_let_user_edit_invited_posts' );
+
+/**
+ * Handler of the ajax call executed when one editor send a request message to delete
+ */
+function buddyforms_collaborative_editor_remove_request() {
+	if ( ! ( is_array( $_POST ) && defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+		return;
+	}
+
+	if ( ! isset( $_POST['action'] ) || ! isset( $_POST['nonce'] ) || empty( $_POST['form_slug'] ) || empty( $_POST['post_id'] ) ) {
+		die();
+	}
+
+	if ( ! wp_verify_nonce( $_POST['nonce'], BUDDYFORMS_CPUBLISHING_INSTALL_PATH . 'bf_collaborative_publishing' ) ) {
+		die();
+	}
+
+	$string_error = apply_filters( 'buddyforms_collaborative_publishing_invalid', __( 'There has been an error sending the message!', 'buddyforms-collaborative-publishing' ) );
+
+	if ( ! isset( $_POST['post_id'] ) ) {
+		echo $string_error;
+		die();
+	}
+
+	$form_slug              = sanitize_title( $_POST['form_slug'] );
+	$post_id                = intval( $_POST['post_id'] );
+	$remove_request_subject = ! empty( $_POST['remove_request_email_subject'] ) ? $_POST['remove_request_email_subject'] : __( 'Delete Post Request', 'buddyforms-collaborative-publishing' );
+	$email_body             = ! empty( $_POST['remove_request_email_message'] ) ? $_POST['remove_request_email_message'] : '';
+	$email_body             = buddyforms_cpublishing_message_body( $email_body, $post_id, $form_slug );
+
+	$user_id_requesting = get_current_user_id();
+
+	$from_email = get_option( 'admin_email' );
+
+	$the_post = get_post( $post_id );
+
+	$post_editors       = get_post_meta( $post_id, 'buddyforms_editors', true );
+	$post_editors_array = array();
+	foreach ( $post_editors as $editor ) {
+		$post_editors_array[ $editor ] = $editor;
+	}
+
+	$author_id                        = get_post_field( 'post_author', $post_id );
+	$post_editors_array[ $author_id ] = intval( $author_id );
+
+	$remove_request_subject = apply_filters( 'buddyforms_collaborative_publishing_remove_request_subject', $remove_request_subject, $form_slug, $post_id );
+
+	$home_page   = home_url();
+	$lading_page = apply_filters( 'buddyforms_collaborative_delete_request_redirection', $home_page );
+
+	$permalink = get_permalink( $post_id );
+	$permalink = apply_filters( 'buddyforms_collaborative_publishing_post_url', $permalink, $post_id, $form_slug );
+
+	//Generate the link for secure the process
+	foreach ( $post_editors_array as $post_editor ) {
+		//Not include the user who make the request to delete
+		if ( $post_editor === $user_id_requesting ) {
+			continue;
+		}
+		$code = sha1( $post_editor . time() );
+		update_user_meta( $post_editor, 'buddyforms_delete_post_editor_key_' . $post_id, $code );
+
+		$data        = array(
+			'bf_delete_post_request' => $post_id,
+			'key'                    => $code,
+			'editor_user'            => $post_editor,
+			'trigger_user'           => $user_id_requesting,
+			'author_user'            => $author_id,
+			'nonce'                  => buddyforms_create_nonce( 'buddyforms_bf_offer_complete_request_keys', $post_editor, '' )
+		);
+		$data_string = json_encode( $data );
+
+		$delete_post_link = add_query_arg( array(
+			'bf_remove_request' => base64_encode( $data_string . '|' . wp_nonce_tick() ),
+		), $lading_page );
+
+		// Now let us send the mail
+		$post_editor_info = get_userdata( $post_editor );
+		$mail_to          = $post_editor_info->user_email;
+		$inner_body       = $email_body;
+
+		$inner_body .= PHP_EOL . PHP_EOL . sprintf( "%s <a target='_blank' href=\"%s\">%s</a><br>", __( 'Link to the post:', 'buddyforms-collaborative-publishing' ), $permalink, $the_post->post_title );
+		if ( $post_editor !== intval( $author_id ) ) {
+			$inner_body .= PHP_EOL . sprintf( "%s <a target='_blank' href=\"%s\">%s</a>", __( 'Approve delete request:', 'buddyforms-collaborative-publishing' ), $delete_post_link, __( 'Yes', 'buddyforms-collaborative-publishing' ) );
+		}
+		$inner_body = nl2br( $inner_body );
+		$result     = buddyforms_email( $mail_to, $remove_request_subject, $from_email, $from_email, $inner_body, array(), array(), $form_slug, $post_id );
+
+		if ( ! $result ) {
+			BuddyFormsCPublishing::error_log( sprintf( "Error Sending the Remove Request Email. Form: %s", $form_slug ) );
+			die();
+		}
+	}
+
+	wp_send_json_success( array( 'form_slug' => $form_slug, 'post_id' => $post_id ) );
+	die();
+}
+
+add_action( 'wp_ajax_buddyforms_editor_remove_request', 'buddyforms_collaborative_editor_remove_request' );
+
+/**
+ * Handle the request of approve to delete link
+ */
+function buddyforms_collaborative_delete_post_request() {
+	try {
+		if ( ! is_array( $_GET ) ) {
+			return;
+		}
+		if ( ! isset( $_GET['bf_remove_request'] ) ) {
+			return;
+		}
+
+		$data = base64_decode( $_GET['bf_remove_request'] );
+
+		$tick = wp_nonce_tick();
+
+		$data = str_replace( '|' . $tick, '', $data );
+
+		if ( empty( $data ) ) {
+			throw new Exception( 'Security Problems' );
+		}
+
+		$data = json_decode( $data, true );
+
+		if ( ! isset( $data['key'] ) || ! isset( $data['bf_delete_post_request'] ) || ! isset( $data['editor_user'] ) || ! isset( $data['author_user'] ) || ! isset( $data['nonce'] ) || ! isset( $data['trigger_user'] ) ) {
+			throw new Exception( 'Invalid parameters ' );
+		}
+
+		$post_id      = intval( $data['bf_delete_post_request'] );
+		$editor_user  = intval( $data['editor_user'] );
+		$author_user  = intval( $data['author_user'] );
+		$trigger_user = intval( $data['trigger_user'] );
+
+		$expected = buddyforms_create_nonce( 'buddyforms_bf_offer_complete_request_keys', $editor_user, '' );
+		$nonce    = sanitize_text_field( $data['nonce'] );
+
+		if ( ! hash_equals( $expected, $nonce ) ) {
+			throw new Exception( sprintf( 'Invalid NONCE for post_id: %s', $post_id ) );
+		}
+
+		$expected_key = get_user_meta( $editor_user, 'buddyforms_delete_post_editor_key_' . $post_id, true );
+		$key          = sanitize_text_field( $data['key'] );
+
+		if ( ! hash_equals( $expected_key, $key ) ) {
+			throw new Exception( sprintf( 'Invalid KEY for post_id: %s', $post_id ) );
+		}
+
+		// Delete editor from meta and taxonomies
+		buddyforms_cpublishing_delete_post( $post_id, $editor_user );
+
+		//Get all editor include the author
+		$post_editors = get_post_meta( $post_id, 'buddyforms_editors', true );
+		if ( empty( $post_editors ) ) {
+			throw new Exception( sprintf( 'Invalid editor from post meta in post_id: %s', $post_id ) );
+		}
+
+		//Remove the trigger user from the editors
+		$trigger_user_index = array_search( $trigger_user, $post_editors );
+		if ( ! empty( $trigger_user_index ) ) {
+			unset( $post_editors[ $trigger_user_index ] );
+		}
+		//Remove the author of the post from the editors
+		$trigger_author_index = array_search( $author_user, $post_editors );
+		if ( ! empty( $trigger_author_index ) ) {
+			unset( $post_editors[ $trigger_author_index ] );
+		}
+
+		$post_count = count( $post_editors );
+		//If no user include the author left, then delete the post
+		if ( $post_count == 0 ) {
+			do_action( 'buddyforms_delete_post', $post_id );
+			wp_delete_post( $post_id );
+		}
+		add_action( 'wp_head', 'buddyforms_collaborative_delete_post_request_success' );
+	} catch ( Exception $ex ) {
+		BuddyFormsCPublishing::error_log( $ex->getMessage() );
+		add_action( 'wp_head', 'buddyforms_collaborative_delete_post_request_error' );
+	}
+}
+
+add_action( 'parse_request', 'buddyforms_collaborative_delete_post_request' );
+
+function buddyforms_collaborative_delete_post_request_success() {
+	$home_page       = home_url();
+	$lading_page     = apply_filters( 'buddyforms_collaborative_delete_request_complete_redirection', $home_page );
+	$complete_string = apply_filters( 'buddyforms_collaborative_delete_request_complete_string', __( 'Delete request processed.', 'buddyforms-contact-author' ) );
+	?>
+	<script>
+		jQuery(document).ready(function () {
+			alert('<?php echo esc_attr( $complete_string ) ?>');
+			document.location.href = '<?php echo $lading_page; ?>';
+		});
+	</script>
+	<?php
+}
+
+function buddyforms_collaborative_delete_post_request_error() {
+	$error_string = apply_filters( 'buddyforms_collaborative_delete_request_error_string', __( 'Delete request not processed. Error throw, please review the logs.', 'buddyforms-contact-author' ) );
+	?>
+	<script>
+		jQuery(document).ready(function () {
+			alert(<?php echo esc_attr( $error_string ) ?>);
+		});
+	</script>
+	<?php
+}

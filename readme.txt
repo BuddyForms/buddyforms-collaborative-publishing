@@ -1,6 +1,6 @@
 === BuddyForms Collaborative Publishing ===
 Contributors: svenl77, gfirem, themekraft
-Tags:
+Tags: buddyforms, collaborative, collaborative publishing, buddyforms collaborative publishing, post collaborative publishing, blog post collaborative, blog post publishing, post publishing
 Requires at least: 4.9
 Tested up to: 5.2
 Stable tag: 1.0.0

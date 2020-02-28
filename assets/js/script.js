@@ -246,6 +246,68 @@ var buddyformsCollaborativePublishingInstance = {
 
 		return fieldName;
 	},
+	bfSendRemoveMessage: function (event) {
+		event.preventDefault();
+		var currentPopup = jQuery('#TB_ajaxContent');
+		if (currentPopup && currentPopup.length === 0) {
+			console.log('something went wrong, tickbox is not present, please contact the admin');
+			return false;
+		}
+
+		var element = jQuery(this);
+		var post_id = element.attr("data-post_id");
+		var form_slug = element.attr("data-form_slug");
+
+		if (!post_id || !form_slug) {
+			console.log('something went wrong, parameters are not present, please contact the admin');
+			return false;
+		}
+
+		var post_delete_email_subject = currentPopup.find('#post_delete_email_subject_' + post_id).val();
+		var post_delete_email_message = currentPopup.find('#post_delete_email_message_' + post_id).val();
+		var removeRequestSuccessfully = buddyformsCollaborativePublishingObj.language.remove_request_successfully || 'Delete Request has been send successfully.';
+		var invalidSubjectStr = buddyformsCollaborativePublishingObj.language.invalid_remove_request_subject || 'Subject is a required field.';
+		var invalidMessageStr = buddyformsCollaborativePublishingObj.language.invalid_remove_request_message || 'Message is a required field.';
+		if (post_delete_email_subject === '') {
+			alert(invalidSubjectStr);
+			return false;
+		}
+		if (post_delete_email_message === '') {
+			alert(invalidMessageStr);
+			return false;
+		}
+
+		element.attr('disabled', true);
+		var actionButtonOriginalText = element.text();
+		var popupLoading = buddyformsCollaborativePublishingObj.language.popup_loading || 'Loading...';
+		element.text(popupLoading);
+
+		jQuery.ajax({
+			type: 'POST',
+			url: buddyformsCollaborativePublishingObj.ajax,
+			data: {
+				"action": "buddyforms_editor_remove_request",
+				"post_id": post_id,
+				"nonce": buddyformsCollaborativePublishingObj.nonce,
+				"form_slug": form_slug,
+				"remove_request_email_subject": post_delete_email_subject,
+				"remove_request_email_message": post_delete_email_message
+			},
+			success: function (data) {
+				if (data.data && data.data.form_slug && data.data.post_id) {
+					alert(removeRequestSuccessfully);
+				}
+				tb_remove();
+				element.text(actionButtonOriginalText);
+				element.removeAttr('disabled');
+			},
+			error: function (request, status, error) {
+				element.text(actionButtonOriginalText);
+				element.removeAttr('disabled');
+				alert(request.responseText);
+			}
+		});
+	},
 	init: function () {
 		if (buddyformsCollaborativePublishingObj && buddyformsCollaborativePublishingObj.nonce && buddyformsCollaborativePublishingObj.ajax) {
 			jQuery(document.body).on('click', '.bf_cpublishing_delete_post', buddyformsCollaborativePublishingInstance.bfDeletePost);
@@ -253,6 +315,7 @@ var buddyformsCollaborativePublishingInstance = {
 			jQuery(document.body).on('click', '.bf_become_an_editor', buddyformsCollaborativePublishingInstance.bfBecomeAnEditor);
 			jQuery(document.body).on('click', '#buddyforms_invite_new_user_as_editor', buddyformsCollaborativePublishingInstance.bfInviteNewEditors);
 			jQuery(document.body).on('click', '.bf-collaborative-remove-email-invite', buddyformsCollaborativePublishingInstance.bfRemoveEmailInvitation);
+			jQuery(document.body).on('click', '.buddyforms_send_delete_request', buddyformsCollaborativePublishingInstance.bfSendRemoveMessage);
 		}
 	}
 };

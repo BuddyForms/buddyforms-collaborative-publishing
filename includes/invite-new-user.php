@@ -1,6 +1,5 @@
 <?php
 function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
-	global $post, $buddyforms;
 	$description     = '';
 	$new_user_emails = get_post_meta( $post_id, 'buddyforms_new_user_emails', true );
 	?>
@@ -9,7 +8,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 	</p>
 
 	<div id="buddyforms_panding_invites">
-		<p><strong><?php echo __( 'Pending Invites', 'buddyforms-collaborative-publishing' ) ?></strong></p>
+		<p><strong><?php echo __( 'Pending Invites to Editors', 'buddyforms-collaborative-publishing' ) ?></strong></p>
 		<div>
 			<ul id="buddyforms_pending_invites_list">
 				<?php
@@ -141,7 +140,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 						    });
 						</script>
 						<div class="bf_field_group">
-	                        <label for="editpost-element-user_invite_email_select"><strong>' . __( 'Invite Users', 'buddyforms-collaborative-publishing' ) . '</strong></label>
+	                        <label for="editpost-element-user_invite_email_select">' . __( 'Invite Users', 'buddyforms-collaborative-publishing' ) . $form2->renderRequired() . '</label>
 	                        <div class="bf_inputs bf-input">' . $dropdown . '</div>
 		                	<span class="help-inline">' . $description . '</span>
 		                </div>';
@@ -154,7 +153,7 @@ function buddyforms_cbublishing_invite_new_editor( $post_id, $form_slug ) {
 				'class'     => 'collaburative-publishiing-message',
 				'rows'      => '15',
 				'shortDesc' => apply_filters( 'buddyforms_collaborative_publishing_message_description', '' ),
-			) ) );
+			), array( 'required' => 'required' ) ) );
 
 			$form2->render();
 

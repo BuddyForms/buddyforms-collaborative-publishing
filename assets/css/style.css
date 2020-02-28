@@ -1,4 +1,4 @@
-#buddyforms_invite_wrap input[type="text"] {
+#buddyforms_invite_wrap input[type="text"], #buddyforms_delete_wrap input[type="text"] {
 	width: 100%;
 }
 
@@ -32,6 +32,20 @@ div#TB_ajaxContent {
 	height: auto !important;
 	max-width: 100%;
 	box-sizing: border-box;
+}
+
+#TB_ajaxContent .bf_field_group {
+	margin-top: 15px;
+}
+
+#TB_ajaxContent .bf_field_group label {
+	font-weight: bold;
+	font-style: normal;
+	margin-right: 10px;
+}
+
+#TB_ajaxContent .bf_field_group .error{
+	color:red;
 }
 
 /* Screen = 1281px to higher resolution desktops */
@@ -69,6 +83,11 @@ div#TB_ajaxContent {
 	}
 }
 
-.bf-collaborative-remove-email-invite-container{
+.bf-collaborative-remove-email-invite-container {
 	color: red;
+	margin-left: 2em;
+}
+
+ul#buddyforms_pending_invites_list {
+    margin-left: 2em;
 }
